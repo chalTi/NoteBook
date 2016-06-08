@@ -17,8 +17,7 @@
         android:layout_height="match_parent"
         android:gravity="top|left"
         android:textColor="#727272"
-        android:background="@null"
-        android:enabled="false"/>
+        android:background="@null"/>
 
     <Button
         android:id="@+id/edit_btn"

@@ -1,20 +1,18 @@
 package com.wentongwang.notebook.activity;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.wentongwang.notebook.R;
+import com.wentongwang.notebook.model.DiaryItem;
 import com.wentongwang.notebook.model.NoteItem;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.utils.DatabaseUtils;
@@ -25,10 +23,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * 观看，修改note的界面
- * Created by Wentong WANG on 2016/6/6.
+ * 修改日记界面
+ * Created by Wentong WANG on 2016/6/8.
  */
-public class EditNoteActivity extends Activity implements View.OnClickListener{
+public class EditeDiaryActivity extends Activity implements View.OnClickListener{
     private View toolbar;
     private TextView title;
     private ImageView leftBtn;
@@ -38,13 +36,13 @@ public class EditNoteActivity extends Activity implements View.OnClickListener{
     private EditText text;
     private DatabaseUtils databaseUtils;
 
-    private NoteItem thisNote;
+    private DiaryItem thisDiary;
 
     private boolean onEdit = false;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.edit_note_activity_layout);
+        setContentView(R.layout.edit_diray_activity_layout);
 
         databaseUtils = new DatabaseUtils(getBaseContext());
         initDatas();
@@ -54,19 +52,19 @@ public class EditNoteActivity extends Activity implements View.OnClickListener{
 
     private void initDatas() {
         Bundle bundle = getIntent().getExtras();
-        thisNote = (NoteItem) bundle.getSerializable("my_note");
+        thisDiary = (DiaryItem) bundle.getSerializable("my_diary");
     }
 
     private void initViews() {
         toolbar = findViewById(R.id.top_toolbar);
         title = (TextView) toolbar.findViewById(R.id.title);
-        title.setText(thisNote.getNote_date());
+        title.setText(thisDiary.getDiary_title());
         leftBtn = (ImageView) toolbar.findViewById(R.id.left_btn);
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.back_btn);
         leftBtn.setImageBitmap(bitmap);
 
         text = (EditText) findViewById(R.id.note_content);
-        text.setText(thisNote.getNote_content());
+        text.setText(thisDiary.getDiary_content());
         text.setEnabled(false);
 
         editBtn = (Button) findViewById(R.id.edit_btn);
@@ -90,13 +88,7 @@ public class EditNoteActivity extends Activity implements View.OnClickListener{
                 break;
             case R.id.edit_btn:
                 if (!onEdit) {
-                    //EditText可编辑状态
                     text.setEnabled(true);
-                    text.setSelection(text.getText().toString().length());
-
-                    InputMethodManager inputMethodManager=(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-
                     editBtn.setBackground(getResources().getDrawable(R.drawable.confirm_btn));
                     onEdit = true;
                 } else {
@@ -116,16 +108,17 @@ public class EditNoteActivity extends Activity implements View.OnClickListener{
         note_content = text.getText().toString();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd " + "hh:mm:ss");
-        thisNote.setNote_date(sdf.format(new Date()));
-        thisNote.setNote_content(note_content);
+        thisDiary.setDiary_date(sdf.format(new Date()));
+        thisDiary.setDiary_content(note_content);
 
-        int id = databaseUtils.UpdateNoteInfo(thisNote);
-        Log.e("xxxx", "noteID = " + id + " 修改完成");
+        int id = databaseUtils.UpdateDiaryInfo(thisDiary);
+        Log.e("xxxx", "DiaryID = " + id + " 修改完成");
 
         databaseUtils.close();
         //通知界面更新
         UpdataEvent event = new UpdataEvent();
-        event.setType(UpdataEvent.UPDATE_NOTES);
+        event.setType(UpdataEvent.UPDATE_DIARIES);
         EventBus.getDefault().post(event);
+
     }
 }

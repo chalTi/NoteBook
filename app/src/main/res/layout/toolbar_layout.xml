@@ -2,34 +2,42 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:background="@color/colorPrimary">
+    android:layout_height="50dp">
 
-    <ImageView
-        android:id="@+id/left_btn"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="30dp"
-        android:layout_gravity="center"
-        android:src="@drawable/left_btn"/>
-
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="0dp"
-        android:layout_weight="3"
+    <LinearLayout
+        android:id="@+id/top_toolbar_container"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="标题"
-        android:textSize="22sp"
-        android:gravity="center_vertical"
-        android:textColor="@android:color/white"
-        />
+        android:background="@color/colorPrimary">
 
-    <ImageView
-        android:id="@+id/right_btn"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="30dp"
-        android:layout_gravity="center"
-        android:src="@drawable/confirm"
-        android:visibility="invisible"/>
+        <ImageView
+            android:id="@+id/left_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:src="@drawable/left_btn"/>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="match_parent"
+            android:text="标题"
+            android:textSize="22sp"
+            android:gravity="center_vertical"
+            android:textColor="@android:color/white"
+            />
+
+        <ImageView
+            android:id="@+id/right_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:src="@drawable/confirm"
+            android:visibility="invisible"/>
+    </LinearLayout>
+
 </LinearLayout>

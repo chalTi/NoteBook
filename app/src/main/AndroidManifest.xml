@@ -35,8 +35,11 @@
             android:windowSoftInputMode="stateVisible|adjustResize"
             />
         <activity android:name=".activity.EditNoteActivity"
-            android:windowSoftInputMode="stateVisible|adjustResize"
+            android:windowSoftInputMode="stateHidden|adjustResize"
             />
+        <activity android:name=".activity.EditeDiaryActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize"/>
+
         <activity android:name=".activity.CreateDiaryActivity"
             android:windowSoftInputMode="stateVisible|adjustResize"
             />

@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -19,6 +20,8 @@ import android.widget.TextView;
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.activity.CreateDiaryActivity;
 import com.wentongwang.notebook.activity.CreateNoteActivity;
+import com.wentongwang.notebook.activity.EditNoteActivity;
+import com.wentongwang.notebook.activity.EditeDiaryActivity;
 import com.wentongwang.notebook.model.DiaryItem;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.utils.DatabaseUtils;
@@ -136,6 +139,22 @@ public class DiariesFragment extends Fragment {
                 }
             }
         });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent();
+                intent.setClass(getActivity(), EditeDiaryActivity.class);
+
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("my_diary", diaryItems.get(position));
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
+
+
+
 
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
