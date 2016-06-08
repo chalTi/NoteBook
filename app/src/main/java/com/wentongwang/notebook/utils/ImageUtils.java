@@ -19,7 +19,6 @@ import android.os.Build;
 public class ImageUtils {
 
     /**
-     *
      * 由资源id获取位图
      */
 
@@ -34,7 +33,7 @@ public class ImageUtils {
      * bitmap裁剪成圆形
      *
      * @param source
-     * @param r 直径
+     * @param r      直径
      * @return
      */
     public static Bitmap creatCircleBitmap(Bitmap source, int r) {
@@ -53,7 +52,7 @@ public class ImageUtils {
         if (r / 2 < source.getWidth()) {
             canvas.drawBitmap(source, 0, 0, mPaint);
         } else {
-            canvas.drawBitmap(source,r / 2 - source.getWidth() / 2, r / 2 - source.getWidth() / 2, mPaint);
+            canvas.drawBitmap(source, r / 2 - source.getWidth() / 2, r / 2 - source.getWidth() / 2, mPaint);
         }
 
 
@@ -63,14 +62,10 @@ public class ImageUtils {
     /**
      * 对图片进行压缩（不改变宽高）, 展示在ImageView中
      *
-     * @param res
-     *            getResource()获取
-     * @param resId
-     *            資源id
-     * @param reqWidth
-     *            要求的宽度, 单位像素
-     * @param reqHeight
-     *            要求的高度, 单位像素
+     * @param res       getResource()获取
+     * @param resId     資源id
+     * @param reqWidth  要求的宽度, 单位像素
+     * @param reqHeight 要求的高度, 单位像素
      * @return 压缩后的bitmap
      */
     public static Bitmap decodeBitmapFromResource(Resources res, int resId,
@@ -86,6 +81,7 @@ public class ImageUtils {
         options.inJustDecodeBounds = false;
         return BitmapFactory.decodeResource(res, resId, options);
     }
+
     /**
      * 计算压缩比例
      *
@@ -114,16 +110,16 @@ public class ImageUtils {
 
     /**
      * 改变图片的宽高
-     * @param bm 所要转换的bitmap
-     * @param newWidth 新的宽
+     *
+     * @param bm        所要转换的bitmap
+     * @param newWidth  新的宽
      * @param newHeight 新的高
      * @return 指定宽高的bitmap
      */
-    public static Bitmap resize(Bitmap bm, int newWidth ,int newHeight) {
+    public static Bitmap resize(Bitmap bm, int newWidth, int newHeight) {
+
         Bitmap newbm = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
-            newbm = ThumbnailUtils.extractThumbnail(bm, newWidth, newHeight);
-        } else {
+        if (bm != null) {
             // 获得图片的宽高
             int width = bm.getWidth();
             int height = bm.getHeight();
