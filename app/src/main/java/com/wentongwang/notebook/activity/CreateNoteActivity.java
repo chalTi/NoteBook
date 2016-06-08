@@ -83,7 +83,7 @@ public class CreateNoteActivity extends Activity {
                 noteItem.setNote_date(sdf.format(new Date()));
                 noteItem.setNote_content(note_content);
                 noteItem.setNote_priority(0);
-                noteItem.setNote_user_id((String) SPUtils.get(CreateNoteActivity.this,"user_id",""));
+                noteItem.setNote_user_id((String) SPUtils.get(CreateNoteActivity.this, Constants.USER_ID, ""));
 
                 noteItem.save(CreateNoteActivity.this, new SaveListener() {
                     @Override

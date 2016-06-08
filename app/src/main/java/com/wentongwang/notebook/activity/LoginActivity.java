@@ -32,6 +32,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     private EditText userPwd;
     private String pwd;
     private String user_name;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,8 +52,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
         if (SPUtils.contains(this, "user_name")) {
 
-            user_name = (String) SPUtils.get(this, "user_name", "");
-            pwd = (String) SPUtils.get(this, "user_pwd", "");
+            user_name = (String) SPUtils.get(this, Constants.USER_NAME, "");
+            pwd = (String) SPUtils.get(this, Constants.USER_PWD, "");
             login();
         }
     }
@@ -102,9 +103,9 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 User user = new User();
                 user = BmobUser.getCurrentUser(LoginActivity.this, User.class);
 
-                SPUtils.put(LoginActivity.this,"user_name",user_name);
-                SPUtils.put(LoginActivity.this,"user_pwd", pwd);
-                SPUtils.put(LoginActivity.this,"user_id",user.getObjectId());
+                SPUtils.put(LoginActivity.this, Constants.USER_NAME, user_name);
+                SPUtils.put(LoginActivity.this, Constants.USER_PWD, pwd);
+                SPUtils.put(LoginActivity.this, Constants.USER_ID, user.getObjectId());
 
                 Intent it = new Intent();
                 it.setClass(LoginActivity.this, HomeActivity.class);

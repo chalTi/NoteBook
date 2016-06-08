@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
+import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.DiaryItem;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.utils.DatabaseUtils;
@@ -87,7 +88,7 @@ public class CreateDiaryActivity  extends Activity {
                 diaryItem.setDiary_title(diary_title);
                 diaryItem.setDiary_content(diary_content);
                 diaryItem.setIsLocked(false);
-                diaryItem.setDiary_user_id((String) SPUtils.get(CreateDiaryActivity.this, "user_id", ""));
+                diaryItem.setDiary_user_id((String) SPUtils.get(CreateDiaryActivity.this, Constants.USER_ID, ""));
                 diaryItem.save(CreateDiaryActivity.this, new SaveListener() {
                     @Override
                     public void onSuccess() {
