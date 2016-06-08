@@ -104,6 +104,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
                 SPUtils.put(LoginActivity.this,"user_name",user_name);
                 SPUtils.put(LoginActivity.this,"user_pwd", pwd);
+                SPUtils.put(LoginActivity.this,"user_id",user.getObjectId());
 
                 Intent it = new Intent();
                 it.setClass(LoginActivity.this, HomeActivity.class);

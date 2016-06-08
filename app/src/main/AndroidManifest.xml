@@ -37,7 +37,7 @@
         <activity android:name=".activity.EditNoteActivity"
             android:windowSoftInputMode="stateHidden|adjustResize"
             />
-        <activity android:name=".activity.EditeDiaryActivity"
+        <activity android:name=".activity.EditDiaryActivity"
             android:windowSoftInputMode="stateHidden|adjustResize"/>
 
         <activity android:name=".activity.CreateDiaryActivity"

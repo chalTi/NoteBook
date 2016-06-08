@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,19 +16,26 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.activity.CreateNoteActivity;
 import com.wentongwang.notebook.activity.EditNoteActivity;
+import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.NoteItem;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.utils.DatabaseUtils;
+import com.wentongwang.notebook.utils.SPUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.listener.FindListener;
 
 
 /**
@@ -46,8 +54,6 @@ public class NotesFragment extends Fragment {
     private TextView nodata;
     private boolean isBtnShow = true;
 
-    //数据库操作工具
-    private DatabaseUtils databaseUtils;
 
     /**
      * 用于刷新listview的
@@ -86,32 +92,53 @@ public class NotesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (databaseUtils != null) {
-            getNotes();
-        }
+        getNotes();
     }
 
     private void initData() {
-
-        databaseUtils = new DatabaseUtils(getActivity());
         listNotes = new ArrayList<>();
-//        if (databaseUtils != null) {
-//            listNotes = new ArrayList<>();
-//            getNotes();
-//        }
     }
 
     /**
      * 从数据库中提取notes
      */
     private void getNotes(){
-        listNotes = databaseUtils.getNotes();
-        if (listNotes == null || listNotes.size() == 0) {
-            nodata.setVisibility(View.VISIBLE);
-        } else {
-            nodata.setVisibility(View.GONE);
-        }
-        adapter.notifyDataSetChanged();
+        Bmob.initialize(getActivity(), Constants.APPLICATION_ID);
+
+        BmobQuery<NoteItem> query = new BmobQuery<NoteItem>();
+        //查询该用户有的notes
+        String user_id = (String) SPUtils.get(getActivity(), "user_id", "");
+        Log.i("xxxx", "user_id = " + user_id);
+        query.addWhereEqualTo(NoteItem.NOTE_USER_ID, user_id);
+        //返回50条数据，如果不加上这条语句，默认返回10条数据
+        query.setLimit(50);
+        //按更新日期降序排列
+        query.order("-updatedAt");
+        //执行查询方法
+        query.findObjects(getActivity(), new FindListener<NoteItem>() {
+            @Override
+            public void onSuccess(List<NoteItem> object) {
+                listNotes.clear();
+                if (object.size() > 0) {
+                    for (NoteItem noteItem : object) {
+                        //获得信息
+                        listNotes.add(noteItem);
+                    }
+                    nodata.setVisibility(View.GONE);
+                    adapter.notifyDataSetChanged();
+                } else {
+                    nodata.setVisibility(View.VISIBLE);
+                }
+
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                nodata.setVisibility(View.VISIBLE);
+                Toast.makeText(getActivity(), "操作失败: " + msg, Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 
     private void initViews(View root) {

@@ -10,16 +10,22 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
+import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.NoteItem;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.utils.DatabaseUtils;
+import com.wentongwang.notebook.utils.SPUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.listener.SaveListener;
 
 /**
  * 创建新的便签
@@ -34,14 +40,12 @@ public class CreateNoteActivity extends Activity {
 
     private EditText text;
 
-    private DatabaseUtils databaseUtils;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_note_activity_layout);
 
-        databaseUtils = new DatabaseUtils(getBaseContext());
-
+        Bmob.initialize(this, Constants.APPLICATION_ID);
         initViews();
         initEvents();
     }
@@ -75,18 +79,26 @@ public class CreateNoteActivity extends Activity {
                 note_content = text.getText().toString();
                 NoteItem noteItem = new NoteItem();
                 //获取当前时间
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd " + "hh:mm:ss");
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd " + "hh:mm:ss");
                 noteItem.setNote_date(sdf.format(new Date()));
                 noteItem.setNote_content(note_content);
+                noteItem.setNote_priority(0);
+                noteItem.setNote_user_id((String) SPUtils.get(CreateNoteActivity.this,"user_id",""));
 
-                Long id = databaseUtils.saveNote(noteItem);
-                Log.e("xxxx", "noteID = " + id);
+                noteItem.save(CreateNoteActivity.this, new SaveListener() {
+                    @Override
+                    public void onSuccess() {
+                        UpdataEvent event = new UpdataEvent();
+                        event.setType(UpdataEvent.UPDATE_NOTES);
+                        EventBus.getDefault().post(event);
+                        onBackPressed();
+                    }
+                    @Override
+                    public void onFailure(int code, String msg) {
+                        Toast.makeText(CreateNoteActivity.this, "操作失败: " + msg, Toast.LENGTH_LONG).show();
+                    }
+                });
 
-                databaseUtils.close();
-                UpdataEvent event = new UpdataEvent();
-                event.setType(UpdataEvent.UPDATE_NOTES);
-                EventBus.getDefault().post(event);
-                onBackPressed();
             }
         });
     }

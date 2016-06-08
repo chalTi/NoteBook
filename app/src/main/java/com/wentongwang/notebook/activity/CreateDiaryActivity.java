@@ -10,16 +10,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.DiaryItem;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.utils.DatabaseUtils;
+import com.wentongwang.notebook.utils.SPUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import cn.bmob.v3.listener.SaveListener;
 
 /**
  *
@@ -35,15 +39,10 @@ public class CreateDiaryActivity  extends Activity {
     private EditText titleText;
     private EditText contentText;
 
-    private DatabaseUtils databaseUtils;
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_diary_activity_layout);
-
-        databaseUtils = new DatabaseUtils(getBaseContext());
 
         initViews();
         initEvents();
@@ -83,19 +82,29 @@ public class CreateDiaryActivity  extends Activity {
 
                 DiaryItem diaryItem = new DiaryItem();
                 //获取当前时间
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd " + "hh:mm:ss");
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd " + "hh:mm:ss");
                 diaryItem.setDiary_date(sdf.format(new Date()));
                 diaryItem.setDiary_title(diary_title);
                 diaryItem.setDiary_content(diary_content);
                 diaryItem.setIsLocked(false);
-                Long id = databaseUtils.saveDiary(diaryItem);
-                Log.e("xxxx", "diaryID = " + id);
+                diaryItem.setDiary_user_id((String) SPUtils.get(CreateDiaryActivity.this, "user_id", ""));
+                diaryItem.save(CreateDiaryActivity.this, new SaveListener() {
+                    @Override
+                    public void onSuccess() {
+                        UpdataEvent event = new UpdataEvent();
+                        event.setType(UpdataEvent.UPDATE_DIARIES);
+                        EventBus.getDefault().post(event);
+                        onBackPressed();
+                    }
 
-                databaseUtils.close();
-                UpdataEvent event = new UpdataEvent();
-                event.setType(UpdataEvent.UPDATE_DIARIES);
-                EventBus.getDefault().post(event);
-                onBackPressed();
+                    @Override
+                    public void onFailure(int code, String msg) {
+                        Toast.makeText(CreateDiaryActivity.this, "操作失败: " + msg, Toast.LENGTH_LONG).show();
+                    }
+                });
+
+
+
             }
         });
     }

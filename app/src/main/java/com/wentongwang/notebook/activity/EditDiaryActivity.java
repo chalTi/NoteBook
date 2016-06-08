@@ -1,15 +1,18 @@
 package com.wentongwang.notebook.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.DiaryItem;
@@ -22,11 +25,13 @@ import org.greenrobot.eventbus.EventBus;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import cn.bmob.v3.listener.UpdateListener;
+
 /**
  * 修改日记界面
  * Created by Wentong WANG on 2016/6/8.
  */
-public class EditeDiaryActivity extends Activity implements View.OnClickListener{
+public class EditDiaryActivity extends Activity implements View.OnClickListener{
     private View toolbar;
     private TextView title;
     private ImageView leftBtn;
@@ -34,7 +39,6 @@ public class EditeDiaryActivity extends Activity implements View.OnClickListener
     private Button editBtn;
 
     private EditText text;
-    private DatabaseUtils databaseUtils;
 
     private DiaryItem thisDiary;
 
@@ -44,7 +48,7 @@ public class EditeDiaryActivity extends Activity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_diray_activity_layout);
 
-        databaseUtils = new DatabaseUtils(getBaseContext());
+
         initDatas();
         initViews();
         initEvents();
@@ -89,6 +93,11 @@ public class EditeDiaryActivity extends Activity implements View.OnClickListener
             case R.id.edit_btn:
                 if (!onEdit) {
                     text.setEnabled(true);
+                    text.setSelection(text.getText().toString().length());
+                    //弹出软键盘的操作
+                    InputMethodManager inputMethodManager=(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+
                     editBtn.setBackground(getResources().getDrawable(R.drawable.confirm_btn));
                     onEdit = true;
                 } else {
@@ -107,18 +116,25 @@ public class EditeDiaryActivity extends Activity implements View.OnClickListener
         String note_content;
         note_content = text.getText().toString();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd " + "hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd " + "hh:mm:ss");
         thisDiary.setDiary_date(sdf.format(new Date()));
         thisDiary.setDiary_content(note_content);
 
-        int id = databaseUtils.UpdateDiaryInfo(thisDiary);
-        Log.e("xxxx", "DiaryID = " + id + " 修改完成");
+        thisDiary.update(this, thisDiary.getObjectId(), new UpdateListener() {
+            @Override
+            public void onSuccess() {
+                //通知界面更新
+                UpdataEvent event = new UpdataEvent();
+                event.setType(UpdataEvent.UPDATE_DIARIES);
+                EventBus.getDefault().post(event);
+                onBackPressed();
+            }
 
-        databaseUtils.close();
-        //通知界面更新
-        UpdataEvent event = new UpdataEvent();
-        event.setType(UpdataEvent.UPDATE_DIARIES);
-        EventBus.getDefault().post(event);
+            @Override
+            public void onFailure(int code, String msg) {
+                Toast.makeText(EditDiaryActivity.this, "操作失败: " + msg, Toast.LENGTH_LONG).show();
+            }
+        });
 
     }
 }

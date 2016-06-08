@@ -16,21 +16,25 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.activity.CreateDiaryActivity;
-import com.wentongwang.notebook.activity.CreateNoteActivity;
-import com.wentongwang.notebook.activity.EditNoteActivity;
-import com.wentongwang.notebook.activity.EditeDiaryActivity;
+import com.wentongwang.notebook.activity.EditDiaryActivity;
+import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.DiaryItem;
 import com.wentongwang.notebook.model.UpdataEvent;
-import com.wentongwang.notebook.utils.DatabaseUtils;
+import com.wentongwang.notebook.utils.SPUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.listener.FindListener;
 
 /**
  * Created by Wentong WANG on 2016/6/3.
@@ -46,7 +50,6 @@ public class DiariesFragment extends Fragment {
 
     private boolean isBtnShow = true;
 
-    private DatabaseUtils databaseUtils;
     private List<DiaryItem> diaryItems;
 
     private TextView nodata;
@@ -86,26 +89,50 @@ public class DiariesFragment extends Fragment {
     }
 
     private void initDatas() {
-        databaseUtils = new DatabaseUtils(getActivity());
+
         diaryItems = new ArrayList<>();
-
-//        if (databaseUtils != null) {
-//            diaryItems = new ArrayList<>();
-//            getDiaries();
-//        }
-
     }
     /**
      * 获取日记信息
      */
     private void getDiaries(){
-        diaryItems = databaseUtils.getDiaries();
-        if (diaryItems == null || diaryItems.size() == 0) {
-            nodata.setVisibility(View.VISIBLE);
-        } else {
-            nodata.setVisibility(View.GONE);
-        }
-        adapter.notifyDataSetChanged();
+
+        Bmob.initialize(getActivity(), Constants.APPLICATION_ID);
+
+        BmobQuery<DiaryItem> query = new BmobQuery<DiaryItem>();
+        //查询该用户有的diaries
+        String user_id = (String) SPUtils.get(getActivity(), "user_id", "");
+        query.addWhereEqualTo(DiaryItem.DIARY_USER_ID, user_id);
+        //返回50条数据，如果不加上这条语句，默认返回10条数据
+        query.setLimit(50);
+        //按更新日期降序排列
+        query.order("-updatedAt");
+        //执行查询方法
+        query.findObjects(getActivity(), new FindListener<DiaryItem>() {
+            @Override
+            public void onSuccess(List<DiaryItem> object) {
+                diaryItems.clear();
+                if (object.size() > 0) {
+                    for (DiaryItem item : object) {
+                        //获得信息
+                        diaryItems.add(item);
+                    }
+                    nodata.setVisibility(View.GONE);
+                    adapter.notifyDataSetChanged();
+                } else {
+                    nodata.setVisibility(View.VISIBLE);
+                }
+
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                nodata.setVisibility(View.VISIBLE);
+                Toast.makeText(getActivity(), "操作失败: " + msg, Toast.LENGTH_LONG).show();
+            }
+        });
+
+
     }
     private void initViews(View root) {
         nodata = (TextView) root.findViewById(R.id.tv_no_data);
@@ -144,7 +171,7 @@ public class DiariesFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent();
-                intent.setClass(getActivity(), EditeDiaryActivity.class);
+                intent.setClass(getActivity(), EditDiaryActivity.class);
 
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("my_diary", diaryItems.get(position));

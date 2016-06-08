@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.NoteItem;
@@ -23,6 +24,8 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * 观看，修改note的界面
@@ -36,7 +39,6 @@ public class EditNoteActivity extends Activity implements View.OnClickListener{
     private Button editBtn;
 
     private EditText text;
-    private DatabaseUtils databaseUtils;
 
     private NoteItem thisNote;
 
@@ -46,7 +48,6 @@ public class EditNoteActivity extends Activity implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_note_activity_layout);
 
-        databaseUtils = new DatabaseUtils(getBaseContext());
         initDatas();
         initViews();
         initEvents();
@@ -93,7 +94,7 @@ public class EditNoteActivity extends Activity implements View.OnClickListener{
                     //EditText可编辑状态
                     text.setEnabled(true);
                     text.setSelection(text.getText().toString().length());
-
+                    //弹出软键盘的操作
                     InputMethodManager inputMethodManager=(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
 
@@ -104,7 +105,7 @@ public class EditNoteActivity extends Activity implements View.OnClickListener{
                     editBtn.setBackground(getResources().getDrawable(R.drawable.edit_btn));
                     onEdit = false;
                     submitText();
-                    onBackPressed();
+
 
                 }
                 break;
@@ -115,17 +116,27 @@ public class EditNoteActivity extends Activity implements View.OnClickListener{
         String note_content;
         note_content = text.getText().toString();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd " + "hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd " + "hh:mm:ss");
         thisNote.setNote_date(sdf.format(new Date()));
         thisNote.setNote_content(note_content);
 
-        int id = databaseUtils.UpdateNoteInfo(thisNote);
-        Log.e("xxxx", "noteID = " + id + " 修改完成");
+        thisNote.update(this, thisNote.getObjectId(), new UpdateListener() {
+            @Override
+            public void onSuccess() {
+                //通知界面更新
+                UpdataEvent event = new UpdataEvent();
+                event.setType(UpdataEvent.UPDATE_NOTES);
+                EventBus.getDefault().post(event);
+                onBackPressed();
+            }
 
-        databaseUtils.close();
-        //通知界面更新
-        UpdataEvent event = new UpdataEvent();
-        event.setType(UpdataEvent.UPDATE_NOTES);
-        EventBus.getDefault().post(event);
+            @Override
+            public void onFailure(int code, String msg) {
+                Toast.makeText(EditNoteActivity.this, "操作失败: " + msg, Toast.LENGTH_LONG).show();
+            }
+        });
+
+
+
     }
 }
