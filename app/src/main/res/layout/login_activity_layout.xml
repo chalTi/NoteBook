@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+
+    <LinearLayout
+        android:layout_marginTop="200dp"
+        android:id="@+id/ll_login_container"
+        style="@style/edittext_container_style"
+        >
+
+        <EditText
+            android:id="@+id/login_user_name"
+            style="@style/login_edittext_style"
+            android:drawableLeft="@drawable/user_name"
+            android:hint="用户名" />
+
+        <EditText
+            android:id="@+id/login_user_pwd"
+            style="@style/login_edittext_style"
+            android:drawableLeft="@drawable/password"
+            android:inputType="textPassword"
+            android:hint="密码" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_sign_in"
+        style="@style/login_button_style"
+        android:layout_below="@id/ll_login_container"
+        android:background="@drawable/btn_orange_background"
+        android:text="登  陆" />
+
+
+
+    <ImageView
+        android:id="@+id/iv_login_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/btn_sign_in"
+        android:layout_marginEnd="130dp"
+        android:layout_marginStart="130dp"
+        android:layout_marginTop="15dp"
+        android:background="#33000000" />
+
+    <Button
+        android:id="@+id/btn_sign_up"
+        style="@style/login_button_style"
+        android:layout_marginTop="10dp"
+        android:layout_below="@id/iv_login_divider"
+        android:background="@drawable/btn_dark_blue_background"
+        android:text="注  册" />
+</RelativeLayout>

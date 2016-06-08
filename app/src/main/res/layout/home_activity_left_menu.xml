@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="200dp"
+    android:layout_height="match_parent"
+    android:background="#455A64">
+
+
+    <com.wentongwang.notebook.custome.CircleImageView
+        android:id="@+id/iv_left_menu_user_head"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="20dp" />
+
+    <TextView
+        android:id="@+id/tv_left_menu_user_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/iv_left_menu_user_head"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="用户名"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btn_left_menu_userinfo"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_below="@id/tv_left_menu_user_name"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:background="@drawable/btn_light_red_background"
+        android:gravity="center"
+        android:text="个人中心"
+        android:textSize="14sp"
+        android:textColor="@android:color/white"
+        />
+
+
+    <LinearLayout
+        android:id="@+id/ll_fonction_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_left_menu_userinfo"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="20dp"
+        android:divider="@drawable/divider_line"
+        android:orientation="vertical"
+        android:showDividers="middle">
+
+        <TextView
+            android:id="@+id/left_menu_note"
+            style="@style/left_menu_text_style"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/note_icon"
+            android:text="便签" />
+        <TextView
+            android:id="@+id/left_menu_diary"
+            style="@style/left_menu_text_style"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/diary_icon"
+            android:text="日记" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_setting_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:divider="@drawable/divider_line"
+        android:orientation="vertical"
+        android:showDividers="middle">
+
+        <TextView
+            android:id="@+id/left_menu_setting"
+            style="@style/left_menu_text_style"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/setting_icon"
+            android:text="设置" />
+
+        <TextView
+            android:id="@+id/left_menu_about_us"
+            style="@style/left_menu_text_style"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/about_us_icon"
+            android:text="关于软件" />
+    </LinearLayout>
+
+
+</RelativeLayout>

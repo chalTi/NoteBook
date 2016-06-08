@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/white_background">
+
+    <include layout="@layout/toolbar_layout"
+        android:id="@+id/top_toolbar"/>
+
+
+    <EditText
+        android:paddingLeft="5dp"
+        android:paddingTop="5dp"
+        android:id="@+id/note_content"
+        android:layout_marginTop="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="top|left"
+        android:textColor="#727272"
+        android:background="@null"/>
+
+    <Button
+        android:id="@+id/edit_btn"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/edit_btn" />
+</RelativeLayout>
