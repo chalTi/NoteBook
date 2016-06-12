@@ -24,6 +24,7 @@ import com.wentongwang.notebook.activity.EditNoteActivity;
 import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.NoteItem;
 import com.wentongwang.notebook.model.UpdataEvent;
+import com.wentongwang.notebook.utils.AccountUtils;
 import com.wentongwang.notebook.utils.DatabaseUtils;
 import com.wentongwang.notebook.utils.SPUtils;
 
@@ -107,7 +108,7 @@ public class NotesFragment extends Fragment {
 
         BmobQuery<NoteItem> query = new BmobQuery<NoteItem>();
         //查询该用户有的notes
-        String user_id = (String) SPUtils.get(getActivity(), "user_id", "");
+        String user_id = AccountUtils.getUserId(getActivity());
         Log.i("xxxx", "user_id = " + user_id);
         query.addWhereEqualTo(NoteItem.NOTE_USER_ID, user_id);
         //返回50条数据，如果不加上这条语句，默认返回10条数据

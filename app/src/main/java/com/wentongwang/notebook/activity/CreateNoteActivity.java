@@ -16,6 +16,7 @@ import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.NoteItem;
 import com.wentongwang.notebook.model.UpdataEvent;
+import com.wentongwang.notebook.utils.AccountUtils;
 import com.wentongwang.notebook.utils.DatabaseUtils;
 import com.wentongwang.notebook.utils.SPUtils;
 
@@ -45,7 +46,7 @@ public class CreateNoteActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_note_activity_layout);
 
-        Bmob.initialize(this, Constants.APPLICATION_ID);
+//        Bmob.initialize(this, Constants.APPLICATION_ID);
         initViews();
         initEvents();
     }
@@ -83,7 +84,7 @@ public class CreateNoteActivity extends Activity {
                 noteItem.setNote_date(sdf.format(new Date()));
                 noteItem.setNote_content(note_content);
                 noteItem.setNote_priority(0);
-                noteItem.setNote_user_id((String) SPUtils.get(CreateNoteActivity.this, Constants.USER_ID, ""));
+                noteItem.setNote_user_id(AccountUtils.getUserId(CreateNoteActivity.this));
 
                 noteItem.save(CreateNoteActivity.this, new SaveListener() {
                     @Override

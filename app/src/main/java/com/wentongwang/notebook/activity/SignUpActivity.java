@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.User;
+import com.wentongwang.notebook.utils.AccountUtils;
 import com.wentongwang.notebook.utils.MD5Util;
 
 import cn.bmob.v3.Bmob;
@@ -30,6 +31,7 @@ public class SignUpActivity extends Activity {
     private EditText userPwd;
     private EditText userPwd2;
     private Button singUpBtn;
+    private String pwd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +60,7 @@ public class SignUpActivity extends Activity {
         singUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String pwd = userPwd.getText().toString();
+                pwd = userPwd.getText().toString();
                 if (pwd.equals(userPwd2.getText().toString())) {
                     final User bu = new User();
                     bu.setUsername(userName.getText().toString());
@@ -72,11 +74,10 @@ public class SignUpActivity extends Activity {
                             user = BmobUser.getCurrentUser(SignUpActivity.this, User.class);
                             Toast.makeText(SignUpActivity.this, "注册成功", Toast.LENGTH_LONG).show();
                             //通过BmobUser.getCurrentUser(context)方法获取登录成功后的本地用户信息
+
+                            AccountUtils.saveUserInfos(SignUpActivity.this, user, pwd);
                             Intent it = new Intent();
                             it.setClass(SignUpActivity.this, HomeActivity.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putSerializable("user",user);
-                            it.putExtras(bundle);
                             startActivity(it);
                         }
 

@@ -48,12 +48,15 @@ public class ImageUtils {
         //用src_in
         mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
 
-        //最后裁剪
-        if (r / 2 < source.getWidth()) {
-            canvas.drawBitmap(source, 0, 0, mPaint);
-        } else {
-            canvas.drawBitmap(source, r / 2 - source.getWidth() / 2, r / 2 - source.getWidth() / 2, mPaint);
+        if (source != null) {
+            //最后裁剪
+            if (r / 2 < source.getWidth()) {
+                canvas.drawBitmap(source, 0, 0, mPaint);
+            } else {
+                canvas.drawBitmap(source, r / 2 - source.getWidth() / 2, r / 2 - source.getWidth() / 2, mPaint);
+            }
         }
+
 
 
         return mtraget;

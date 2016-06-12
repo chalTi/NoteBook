@@ -20,6 +20,7 @@ import com.wentongwang.notebook.fragment.DiariesFragment;
 import com.wentongwang.notebook.fragment.NotesFragment;
 import com.wentongwang.notebook.model.NoteItem;
 import com.wentongwang.notebook.model.User;
+import com.wentongwang.notebook.utils.AccountUtils;
 
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
     private NotesFragment notesFragment;
     private DiariesFragment diariesFragment;
 
-    private User user;
+    private String user_nickname;
     //左侧菜单栏中用户头像
     private CircleImageView userHeade;
     private TextView userNickName;
@@ -61,8 +62,8 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         notesFragment = new NotesFragment();
         diariesFragment = new DiariesFragment();
 
-        Bundle bundle = getIntent().getExtras();
-        user = (User) bundle.getSerializable("user");
+        user_nickname = AccountUtils.getUserNickName(this);
+
     }
 
     private void initViews() {
@@ -83,10 +84,10 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         userHeade.setImage(R.drawable.user_head_defaut);
 
         userNickName = (TextView) findViewById(R.id.tv_left_menu_user_name);
-        if (!TextUtils.isEmpty(user.getUser_nickname())) {
-            userNickName.setText(user.getUser_nickname());
+        if (!TextUtils.isEmpty(user_nickname)) {
+            userNickName.setText(user_nickname);
         } else {
-            userNickName.setText(user.getUsername());
+            userNickName.setText(AccountUtils.getUserName(this));
         }
         leftMenuBtn = (Button) findViewById(R.id.btn_left_menu_userinfo);
 
@@ -117,11 +118,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
             public void onClick(View v) {
                 Intent it = new Intent();
                 it.setClass(HomeActivity.this, UserInfoActivity.class);
-
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("user", user);
-                it.putExtras(bundle);
-
                 startActivity(it);
             }
         });

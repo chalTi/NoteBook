@@ -24,6 +24,7 @@ import com.wentongwang.notebook.activity.EditDiaryActivity;
 import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.DiaryItem;
 import com.wentongwang.notebook.model.UpdataEvent;
+import com.wentongwang.notebook.utils.AccountUtils;
 import com.wentongwang.notebook.utils.SPUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -101,7 +102,7 @@ public class DiariesFragment extends Fragment {
 
         BmobQuery<DiaryItem> query = new BmobQuery<DiaryItem>();
         //查询该用户有的diaries
-        String user_id = (String) SPUtils.get(getActivity(), "user_id", "");
+        String user_id = AccountUtils.getUserId(getActivity());
         query.addWhereEqualTo(DiaryItem.DIARY_USER_ID, user_id);
         //返回50条数据，如果不加上这条语句，默认返回10条数据
         query.setLimit(50);

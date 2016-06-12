@@ -1,4 +1,6 @@
 package com.wentongwang.notebook.model;
+import android.text.TextUtils;
+
 import java.io.Serializable;
 
 import cn.bmob.v3.BmobUser;
@@ -14,7 +16,10 @@ public class User extends BmobUser implements Serializable{
     private String user_diraypwd;
 
     public String getUser_nickname() {
-        return user_nickname;
+        if (!TextUtils.isEmpty(user_nickname))
+            return user_nickname;
+        else
+            return "";
     }
 
     public void setUser_nickname(String user_nickname) {
@@ -22,7 +27,10 @@ public class User extends BmobUser implements Serializable{
     }
 
     public String getUser_sex() {
-        return user_sex;
+        if (!TextUtils.isEmpty(user_sex))
+            return user_sex;
+        else
+            return "";
     }
 
     public void setUser_sex(String user_sex) {
@@ -30,7 +38,10 @@ public class User extends BmobUser implements Serializable{
     }
 
     public String getUser_diraypwd() {
-        return user_diraypwd;
+        if (!TextUtils.isEmpty(user_diraypwd))
+            return user_diraypwd;
+        else
+            return "";
     }
 
     public void setUser_diraypwd(String user_diraypwd) {

@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.User;
+import com.wentongwang.notebook.utils.AccountUtils;
 import com.wentongwang.notebook.utils.MD5Util;
 import com.wentongwang.notebook.utils.SPUtils;
 
@@ -52,14 +53,15 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
         if (SPUtils.contains(this, "user_name")) {
 
-            user_name = (String) SPUtils.get(this, Constants.USER_NAME, "");
-            pwd = (String) SPUtils.get(this, Constants.USER_PWD, "");
+            user_name = AccountUtils.getUserName(this);
+            pwd = AccountUtils.getUserPwd(this);
+
             login();
         }
     }
 
     private void initDatas() {
-        Bmob.initialize(this, Constants.APPLICATION_ID);
+//        Bmob.initialize(this, Constants.APPLICATION_ID);
     }
 
     private void initViews() {
@@ -103,17 +105,10 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 User user = new User();
                 user = BmobUser.getCurrentUser(LoginActivity.this, User.class);
 
-                SPUtils.put(LoginActivity.this, Constants.USER_NAME, user_name);
-                SPUtils.put(LoginActivity.this, Constants.USER_PWD, pwd);
-                SPUtils.put(LoginActivity.this, Constants.USER_ID, user.getObjectId());
+                AccountUtils.saveUserInfos(LoginActivity.this, user, pwd);
 
                 Intent it = new Intent();
                 it.setClass(LoginActivity.this, HomeActivity.class);
-
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("user", user);
-                it.putExtras(bundle);
-
                 startActivity(it);
             }
 

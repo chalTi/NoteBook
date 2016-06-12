@@ -3,11 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ImageView
+        android:id="@+id/iv_back_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:onClick="onClick"
+        android:src="@drawable/back_btn_dark" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="50dp"
         android:divider="@drawable/divider_line"
         android:orientation="vertical"
         android:showDividers="middle">
@@ -26,12 +34,22 @@
             android:orientation="horizontal">
 
             <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:text="用户名"
+                android:textColor="@android:color/black"
+                android:textSize="20sp" />
+
+            <TextView
                 android:id="@+id/tv_user_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
                 android:paddingBottom="5dp"
-                android:paddingLeft="10dp"
                 android:paddingTop="5dp"
                 android:text="用户名"
                 android:textSize="20sp" />
@@ -52,12 +70,22 @@
             android:orientation="horizontal">
 
             <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:text="昵称"
+                android:textColor="@android:color/black"
+                android:textSize="20sp" />
+
+            <TextView
                 android:id="@+id/tv_user_nickname"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
                 android:paddingBottom="5dp"
-                android:paddingLeft="10dp"
                 android:paddingTop="5dp"
                 android:text="昵称"
                 android:textSize="20sp" />
@@ -68,6 +96,7 @@
                 android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:layout_weight="0.8"
+                android:onClick="onClick"
                 android:src="@drawable/to_right" />
         </LinearLayout>
 
@@ -77,12 +106,22 @@
             android:orientation="horizontal">
 
             <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:text="邮箱"
+                android:textColor="@android:color/black"
+                android:textSize="20sp" />
+
+            <TextView
                 android:id="@+id/tv_user_email"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
                 android:paddingBottom="5dp"
-                android:paddingLeft="10dp"
                 android:paddingTop="5dp"
                 android:text="邮箱"
                 android:textSize="20sp" />
@@ -93,6 +132,7 @@
                 android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:layout_weight="0.8"
+                android:onClick="onClick"
                 android:src="@drawable/to_right" />
         </LinearLayout>
 
@@ -102,12 +142,22 @@
             android:orientation="horizontal">
 
             <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:text="性别"
+                android:textColor="@android:color/black"
+                android:textSize="20sp" />
+
+            <TextView
                 android:id="@+id/tv_user_sex"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
                 android:paddingBottom="5dp"
-                android:paddingLeft="10dp"
                 android:paddingTop="5dp"
                 android:text="性别"
                 android:textSize="20sp" />
@@ -118,6 +168,7 @@
                 android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:layout_weight="0.8"
+                android:onClick="onClick"
                 android:src="@drawable/to_right" />
         </LinearLayout>
 
@@ -127,12 +178,22 @@
             android:orientation="horizontal">
 
             <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:text="日记锁"
+                android:textColor="@android:color/black"
+                android:textSize="20sp" />
+
+            <TextView
                 android:id="@+id/tv_user_diarypwd"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
                 android:paddingBottom="5dp"
-                android:paddingLeft="10dp"
                 android:paddingTop="5dp"
                 android:text="日记密码"
                 android:textSize="20sp" />
@@ -143,13 +204,14 @@
                 android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:layout_weight="0.8"
+                android:onClick="onClick"
                 android:src="@drawable/to_right" />
         </LinearLayout>
     </LinearLayout>
 
 
     <Button
-        android:id="@+id/btn_left_menu_userinfo"
+        android:id="@+id/unregistre_btn"
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:layout_alignParentBottom="true"
@@ -158,6 +220,7 @@
         android:layout_marginRight="70dp"
         android:background="@drawable/btn_light_red_background"
         android:gravity="center"
+        android:onClick="onClick"
         android:text="注  销"
         android:textColor="@android:color/white"
         android:textSize="14sp" />

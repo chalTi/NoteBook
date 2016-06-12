@@ -16,6 +16,7 @@ import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.DiaryItem;
 import com.wentongwang.notebook.model.UpdataEvent;
+import com.wentongwang.notebook.utils.AccountUtils;
 import com.wentongwang.notebook.utils.DatabaseUtils;
 import com.wentongwang.notebook.utils.SPUtils;
 
@@ -24,10 +25,11 @@ import org.greenrobot.eventbus.EventBus;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import cn.bmob.v3.Bmob;
 import cn.bmob.v3.listener.SaveListener;
 
 /**
- *
+ * 创建新的日记
  * Created by Wentong WANG on 2016/6/6.
  */
 public class CreateDiaryActivity  extends Activity {
@@ -44,7 +46,7 @@ public class CreateDiaryActivity  extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_diary_activity_layout);
-
+//        Bmob.initialize(this, Constants.APPLICATION_ID);
         initViews();
         initEvents();
     }
@@ -88,7 +90,7 @@ public class CreateDiaryActivity  extends Activity {
                 diaryItem.setDiary_title(diary_title);
                 diaryItem.setDiary_content(diary_content);
                 diaryItem.setIsLocked(false);
-                diaryItem.setDiary_user_id((String) SPUtils.get(CreateDiaryActivity.this, Constants.USER_ID, ""));
+                diaryItem.setDiary_user_id(AccountUtils.getUserId(CreateDiaryActivity.this));
                 diaryItem.save(CreateDiaryActivity.this, new SaveListener() {
                     @Override
                     public void onSuccess() {
