@@ -25,6 +25,8 @@ public class CircleImageView extends View {
     private Context mContext;
     private Paint mPaint;
 
+    private boolean hasNewBitmap = false;
+
     public CircleImageView(Context context) {
         this(context, null);
     }
@@ -72,7 +74,12 @@ public class CircleImageView extends View {
         super.onDraw(canvas);
         mPaint.setAntiAlias(true);
         //显示圆形图片有问题
-        if (resourceId != -1) {
+
+        if (hasNewBitmap) {
+            bitmap = ImageUtils.resize(bitmap, imageSize, imageSize);
+            canvas.drawBitmap(ImageUtils.creatCircleBitmap(bitmap, imageSize), 0, 0, mPaint);
+            hasNewBitmap = false;
+        } else if (resourceId != -1) {
             bitmap = ImageUtils.decodeBitmapFromResource(getResources(), resourceId, imageSize, imageSize);
             bitmap = ImageUtils.resize(bitmap, imageSize, imageSize);
             canvas.drawBitmap(ImageUtils.creatCircleBitmap(bitmap, imageSize), 0, 0, mPaint);
@@ -86,5 +93,12 @@ public class CircleImageView extends View {
     public void setImage(int resourceId) {
         this.resourceId = resourceId;
 //        bitmap = ImageUtils.decodeBitmapFromResource(getResources(),resourceId,imageSize,imageSize);
+        invalidate();
+    }
+
+    public void setImage(Bitmap bitmap) {
+        this.bitmap = bitmap;
+        hasNewBitmap = true;
+        invalidate();
     }
 }

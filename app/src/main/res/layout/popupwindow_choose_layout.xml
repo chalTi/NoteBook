@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <TextView
+        android:id="@+id/go_to_album"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="相 册"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"/>
+    <ImageView
+        android:layout_width="300dp"
+        android:layout_height="0.5dp"
+        android:layout_gravity="center"
+        android:background="@color/colorPrimaryDark"/>
+    <TextView
+        android:id="@+id/go_to_camera"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="拍 照"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"/>
+</LinearLayout>
