@@ -3,7 +3,15 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <EditText
+        android:id="@+id/et_filter_string"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="搜索"
+        android:drawableLeft="@drawable/search"
+        android:focusableInTouchMode="true"/>
     <ListView
+        android:layout_below="@id/et_filter_string"
         android:id="@+id/diaries_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <EditText
+        android:id="@+id/et_filter_string"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="搜索"
+        android:drawableLeft="@drawable/search"
+        android:focusableInTouchMode="true"/>
+
 
     <ListView
         android:id="@+id/notes_listview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </ListView>
+        android:layout_height="match_parent"
+        android:layout_below="@id/et_filter_string"></ListView>
 
     <Button
         android:id="@+id/add_btn"
@@ -23,10 +34,10 @@
         android:textSize="26sp" />
 
     <TextView
-        android:visibility="gone"
         android:id="@+id/tv_no_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="你还没开始写你的便签，赶快去添加你的便签吧！"/>
+        android:text="你还没开始写你的便签，赶快去添加你的便签吧！"
+        android:visibility="gone" />
 </RelativeLayout>

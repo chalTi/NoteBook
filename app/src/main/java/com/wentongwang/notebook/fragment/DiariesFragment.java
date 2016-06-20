@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,9 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,6 +28,7 @@ import com.wentongwang.notebook.activity.CreateDiaryActivity;
 import com.wentongwang.notebook.activity.EditDiaryActivity;
 import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.DiaryItem;
+import com.wentongwang.notebook.model.NoteItem;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.utils.AccountUtils;
 import com.wentongwang.notebook.utils.SPUtils;
@@ -41,19 +47,22 @@ import cn.bmob.v3.listener.FindListener;
  * Created by Wentong WANG on 2016/6/3.
  */
 public class DiariesFragment extends Fragment {
-
+    //显示日记的list
     private ListView listView;
+    //日记list的适配器
     private MyListViewAdapter adapter;
+    //添加日记按钮
     private Button addBtn;
-
-    //listview上一个显示的条目
+    //listview上一个显示的条目,用于判断滑动
     private int lastItemPosition;
-
+    //用于控制是否显示添加按钮
     private boolean isBtnShow = true;
-
+    //日记items
     private List<DiaryItem> diaryItems;
-
+    //无内容时候显示
     private TextView nodata;
+    //搜索框
+    private EditText etFilter;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -143,6 +152,9 @@ public class DiariesFragment extends Fragment {
         listView.setAdapter(adapter);
 
         addBtn = (Button) root.findViewById(R.id.add_btn);
+
+        etFilter = (EditText) root.findViewById(R.id.et_filter_string);
+
     }
 
 
@@ -181,15 +193,30 @@ public class DiariesFragment extends Fragment {
             }
         });
 
-
-
-
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent it = new Intent();
                 it.setClass(getActivity(), CreateDiaryActivity.class);
                 startActivity(it);
+            }
+        });
+
+        //监听editText的输入变化,用于筛选
+        etFilter.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                adapter.getFilter().filter(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
     }
@@ -228,7 +255,9 @@ public class DiariesFragment extends Fragment {
         EventBus.getDefault().unregister(this);
     }
 
-    private class MyListViewAdapter extends BaseAdapter {
+    private class MyListViewAdapter extends BaseAdapter implements Filterable{
+        private List<DiaryItem> mOriginalValues;
+
         @Override
         public int getCount() {
             return diaryItems.size();
@@ -272,6 +301,52 @@ public class DiariesFragment extends Fragment {
             }
 
             return convertView;
+        }
+
+        @Override
+        public Filter getFilter() {
+            Filter filter = new Filter() {
+
+                @SuppressWarnings("unchecked")
+                @Override
+                protected void publishResults(CharSequence constraint, FilterResults results) {
+
+                    diaryItems = (List<DiaryItem>) results.values; // 将筛选出的内容赋值
+                    notifyDataSetChanged();  // 刷新listview
+                }
+
+                @Override
+                protected FilterResults performFiltering(CharSequence constraint) {
+                    FilterResults results = new FilterResults();        // 要返回的筛选内容
+                    List<DiaryItem> filteredArrList = new ArrayList<>(); //保存筛选结果的
+
+                    if (mOriginalValues == null) {
+                        mOriginalValues = new ArrayList<DiaryItem>(diaryItems); // 保存原有的数据
+                    }
+
+                    if (constraint == null || constraint.length() == 0) {
+                        //如果没有输入，则显示原来的列表
+                        results.count = mOriginalValues.size();
+                        results.values = mOriginalValues;
+                    } else {
+                        //如果有输入，获取输入的内容
+                        constraint = constraint.toString().toLowerCase();
+                        //遍历listview,判断是否有含有该内容的item保存到filteredArrList中
+                        for (int i = 0; i < mOriginalValues.size(); i++) {
+                            String title = mOriginalValues.get(i).getDiary_title();
+                            String data = mOriginalValues.get(i).getDiary_date();
+                            if (data.toLowerCase().startsWith(constraint.toString()) || title.toLowerCase().startsWith(constraint.toString())) {
+                                filteredArrList.add(mOriginalValues.get(i));
+                            }
+                        }
+                        //将筛选完的内容存到result中
+                        results.count = filteredArrList.size();
+                        results.values = filteredArrList;
+                    }
+                    return results;
+                }
+            };
+            return filter;
         }
 
         private class ViewHolder {

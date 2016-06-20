@@ -31,7 +31,9 @@
         </activity>
         <activity android:name=".activity.LoginActivity"/>
         <activity android:name=".activity.SignUpActivity"/>
-        <activity android:name=".activity.HomeActivity"/>
+        <activity android:name=".activity.HomeActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize"
+            />
         <activity android:name=".activity.CreateNoteActivity"
             android:windowSoftInputMode="stateVisible|adjustResize"
             />

@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,10 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,8 +31,6 @@ import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.NoteItem;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.utils.AccountUtils;
-import com.wentongwang.notebook.utils.DatabaseUtils;
-import com.wentongwang.notebook.utils.SPUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -52,12 +56,16 @@ public class NotesFragment extends Fragment {
     private int lastItemPosition;
     private Button addBtn;
 
+    private EditText etFilter;
+
+
     private TextView nodata;
     private boolean isBtnShow = true;
 
 
     /**
      * 用于刷新listview的
+     *
      * @param event
      */
     @Subscribe
@@ -103,7 +111,7 @@ public class NotesFragment extends Fragment {
     /**
      * 从数据库中提取notes
      */
-    private void getNotes(){
+    private void getNotes() {
         Bmob.initialize(getActivity(), Constants.APPLICATION_ID);
 
         BmobQuery<NoteItem> query = new BmobQuery<NoteItem>();
@@ -148,8 +156,11 @@ public class NotesFragment extends Fragment {
         listView = (ListView) root.findViewById(R.id.notes_listview);
         adapter = new MyListViewAdapter();
         listView.setAdapter(adapter);
+        listView.setTextFilterEnabled(true);
 
         addBtn = (Button) root.findViewById(R.id.add_btn);
+
+        etFilter = (EditText) root.findViewById(R.id.et_filter_string);
     }
 
 
@@ -196,10 +207,27 @@ public class NotesFragment extends Fragment {
                 startActivity(intent);
             }
         });
+        etFilter.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                adapter.getFilter().filter(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     /**
      * 隐藏动画
+     *
      * @param view
      */
     private void hideBtnAnim(View view) {
@@ -216,6 +244,7 @@ public class NotesFragment extends Fragment {
 
     /**
      * 显示出来的动画
+     *
      * @param view
      */
     private void showBtnAnim(View view) {
@@ -246,7 +275,9 @@ public class NotesFragment extends Fragment {
         EventBus.getDefault().unregister(this);
     }
 
-    private class MyListViewAdapter extends BaseAdapter {
+    private class MyListViewAdapter extends BaseAdapter implements Filterable {
+        private List<NoteItem> mOriginalValues;
+
         @Override
         public int getCount() {
             return listNotes.size();
@@ -278,7 +309,7 @@ public class NotesFragment extends Fragment {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            NoteItem item = new NoteItem();
+            NoteItem item;
             item = listNotes.get(position);
 
             holder.note_date.setText(item.getNote_date());
@@ -287,9 +318,57 @@ public class NotesFragment extends Fragment {
             return convertView;
         }
 
+        @Override
+        public Filter getFilter() {
+            Filter filter = new Filter() {
+
+                @SuppressWarnings("unchecked")
+                @Override
+                protected void publishResults(CharSequence constraint, FilterResults results) {
+
+                    listNotes = (List<NoteItem>) results.values; // 将筛选出的内容赋值
+                    notifyDataSetChanged();  // 刷新listview
+                }
+
+                @Override
+                protected FilterResults performFiltering(CharSequence constraint) {
+                    FilterResults results = new FilterResults();        // 要返回的筛选内容
+                    List<NoteItem> filteredArrList = new ArrayList<>(); //保存筛选结果的
+
+                    if (mOriginalValues == null) {
+                        mOriginalValues = new ArrayList<NoteItem>(listNotes); // 保存原有的数据
+                    }
+
+                    if (constraint == null || constraint.length() == 0) {
+                        //如果没有输入，则显示原来的列表
+                        results.count = mOriginalValues.size();
+                        results.values = mOriginalValues;
+                    } else {
+                        //如果有输入，获取输入的内容
+                        constraint = constraint.toString().toLowerCase();
+                        //遍历listview,判断是否有含有该内容的item保存到filteredArrList中
+                        for (int i = 0; i < mOriginalValues.size(); i++) {
+                            String content = mOriginalValues.get(i).getNote_content();
+                            String data = mOriginalValues.get(i).getNote_date();
+                            if (data.toLowerCase().startsWith(constraint.toString()) || content.toLowerCase().startsWith(constraint.toString())) {
+                                filteredArrList.add(mOriginalValues.get(i));
+                            }
+                        }
+                        //将筛选完的内容存到result中
+                        results.count = filteredArrList.size();
+                        results.values = filteredArrList;
+                    }
+                    return results;
+                }
+            };
+            return filter;
+        }
+
         private class ViewHolder {
             TextView note_date;
             TextView note_content;
         }
     }
+
+
 }
