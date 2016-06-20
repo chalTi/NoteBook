@@ -41,6 +41,8 @@ public class CreateNoteActivity extends Activity {
 
     private EditText text;
 
+    //进度条
+    private View progressBar;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +64,8 @@ public class CreateNoteActivity extends Activity {
         confirmBtn = (Button) findViewById(R.id.confirm_btn);
 
         text = (EditText) findViewById(R.id.note_content);
+
+        progressBar = findViewById(R.id.progress_bar);
     }
 
 
@@ -76,6 +80,7 @@ public class CreateNoteActivity extends Activity {
         confirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressBar.setVisibility(View.VISIBLE);
                 String note_content;
                 note_content = text.getText().toString();
                 NoteItem noteItem = new NoteItem();
@@ -85,10 +90,10 @@ public class CreateNoteActivity extends Activity {
                 noteItem.setNote_content(note_content);
                 noteItem.setNote_priority(0);
                 noteItem.setNote_user_id(AccountUtils.getUserId(CreateNoteActivity.this));
-
                 noteItem.save(CreateNoteActivity.this, new SaveListener() {
                     @Override
                     public void onSuccess() {
+                        progressBar.setVisibility(View.GONE);
                         UpdataEvent event = new UpdataEvent();
                         event.setType(UpdataEvent.UPDATE_NOTES);
                         EventBus.getDefault().post(event);
@@ -96,6 +101,7 @@ public class CreateNoteActivity extends Activity {
                     }
                     @Override
                     public void onFailure(int code, String msg) {
+                        progressBar.setVisibility(View.GONE);
                         Toast.makeText(CreateNoteActivity.this, "操作失败: " + msg, Toast.LENGTH_LONG).show();
                     }
                 });

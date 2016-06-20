@@ -43,6 +43,9 @@ public class EditDiaryActivity extends Activity implements View.OnClickListener{
     private DiaryItem thisDiary;
 
     private boolean onEdit = false;
+
+    //进度条
+    private View progressBar;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +63,7 @@ public class EditDiaryActivity extends Activity implements View.OnClickListener{
     }
 
     private void initViews() {
+
         toolbar = findViewById(R.id.top_toolbar);
         title = (TextView) toolbar.findViewById(R.id.title);
         title.setText(thisDiary.getDiary_title());
@@ -72,6 +76,8 @@ public class EditDiaryActivity extends Activity implements View.OnClickListener{
         text.setEnabled(false);
 
         editBtn = (Button) findViewById(R.id.edit_btn);
+
+        progressBar = findViewById(R.id.progress_bar);
     }
 
     private void initEvents() {
@@ -113,6 +119,7 @@ public class EditDiaryActivity extends Activity implements View.OnClickListener{
     }
 
     private void submitText(){
+        progressBar.setVisibility(View.VISIBLE);
         String note_content;
         note_content = text.getText().toString();
 
@@ -124,6 +131,7 @@ public class EditDiaryActivity extends Activity implements View.OnClickListener{
             @Override
             public void onSuccess() {
                 //通知界面更新
+                progressBar.setVisibility(View.GONE);
                 UpdataEvent event = new UpdataEvent();
                 event.setType(UpdataEvent.UPDATE_DIARIES);
                 EventBus.getDefault().post(event);
@@ -132,6 +140,7 @@ public class EditDiaryActivity extends Activity implements View.OnClickListener{
 
             @Override
             public void onFailure(int code, String msg) {
+                progressBar.setVisibility(View.GONE);
                 Toast.makeText(EditDiaryActivity.this, "操作失败: " + msg, Toast.LENGTH_LONG).show();
             }
         });

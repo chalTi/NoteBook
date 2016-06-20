@@ -63,6 +63,8 @@ public class DiariesFragment extends Fragment {
     private TextView nodata;
     //搜索框
     private EditText etFilter;
+    //进度条
+    private View progressBar;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -86,6 +88,7 @@ public class DiariesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.diaries_fragment_layout, container, false);
+        progressBar = root.findViewById(R.id.progress_bar);
         initDatas();
         initViews(root);
         initEvents();
@@ -106,7 +109,7 @@ public class DiariesFragment extends Fragment {
      * 获取日记信息
      */
     private void getDiaries(){
-
+        progressBar.setVisibility(View.VISIBLE);
         Bmob.initialize(getActivity(), Constants.APPLICATION_ID);
 
         BmobQuery<DiaryItem> query = new BmobQuery<DiaryItem>();
@@ -132,11 +135,12 @@ public class DiariesFragment extends Fragment {
                 } else {
                     nodata.setVisibility(View.VISIBLE);
                 }
-
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onError(int code, String msg) {
+                progressBar.setVisibility(View.GONE);
                 nodata.setVisibility(View.VISIBLE);
                 Toast.makeText(getActivity(), "操作失败: " + msg, Toast.LENGTH_LONG).show();
             }

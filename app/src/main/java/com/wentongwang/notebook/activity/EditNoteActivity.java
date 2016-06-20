@@ -43,6 +43,8 @@ public class EditNoteActivity extends Activity implements View.OnClickListener{
     private NoteItem thisNote;
 
     private boolean onEdit = false;
+    //进度条
+    private View progressBar;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +73,8 @@ public class EditNoteActivity extends Activity implements View.OnClickListener{
         text.setEnabled(false);
 
         editBtn = (Button) findViewById(R.id.edit_btn);
+
+        progressBar = findViewById(R.id.progress_bar);
     }
 
     private void initEvents() {
@@ -113,6 +117,7 @@ public class EditNoteActivity extends Activity implements View.OnClickListener{
     }
 
     private void submitText(){
+        progressBar.setVisibility(View.VISIBLE);
         String note_content;
         note_content = text.getText().toString();
 
@@ -124,6 +129,7 @@ public class EditNoteActivity extends Activity implements View.OnClickListener{
             @Override
             public void onSuccess() {
                 //通知界面更新
+                progressBar.setVisibility(View.GONE);
                 UpdataEvent event = new UpdataEvent();
                 event.setType(UpdataEvent.UPDATE_NOTES);
                 EventBus.getDefault().post(event);
@@ -132,6 +138,7 @@ public class EditNoteActivity extends Activity implements View.OnClickListener{
 
             @Override
             public void onFailure(int code, String msg) {
+                progressBar.setVisibility(View.GONE);
                 Toast.makeText(EditNoteActivity.this, "操作失败: " + msg, Toast.LENGTH_LONG).show();
             }
         });

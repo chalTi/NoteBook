@@ -42,6 +42,8 @@ public class CreateDiaryActivity  extends Activity {
     private EditText titleText;
     private EditText contentText;
 
+    //进度条
+    private View progressBar;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +66,8 @@ public class CreateDiaryActivity  extends Activity {
         contentText = (EditText) findViewById(R.id.diary_content);
         titleText = (EditText) findViewById(R.id.diary_title);
 
+
+        progressBar = findViewById(R.id.progress_bar);
     }
 
 
@@ -78,6 +82,7 @@ public class CreateDiaryActivity  extends Activity {
         confirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressBar.setVisibility(View.VISIBLE);
                 String diary_content;
                 diary_content = contentText.getText().toString();
                 String diary_title;
@@ -94,6 +99,7 @@ public class CreateDiaryActivity  extends Activity {
                 diaryItem.save(CreateDiaryActivity.this, new SaveListener() {
                     @Override
                     public void onSuccess() {
+                        progressBar.setVisibility(View.GONE);
                         UpdataEvent event = new UpdataEvent();
                         event.setType(UpdataEvent.UPDATE_DIARIES);
                         EventBus.getDefault().post(event);
@@ -102,6 +108,7 @@ public class CreateDiaryActivity  extends Activity {
 
                     @Override
                     public void onFailure(int code, String msg) {
+                        progressBar.setVisibility(View.GONE);
                         Toast.makeText(CreateDiaryActivity.this, "操作失败: " + msg, Toast.LENGTH_LONG).show();
                     }
                 });

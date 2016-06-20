@@ -54,15 +54,16 @@ public class NotesFragment extends Fragment {
     private List<NoteItem> listNotes;
     //listview上一个显示的条目
     private int lastItemPosition;
+    //添加按钮
     private Button addBtn;
-
+    //搜索框
     private EditText etFilter;
-
-
-    private TextView nodata;
+    //判断是否显示右下角的按钮
     private boolean isBtnShow = true;
-
-
+    //无内容时的显示
+    private TextView nodata;
+    //进度条
+    private View progressBar;
     /**
      * 用于刷新listview的
      *
@@ -92,6 +93,7 @@ public class NotesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.notes_fragment_layout, container, false);
+        progressBar = root.findViewById(R.id.progress_bar);
         initData();
         initViews(root);
         initEvents();
@@ -112,6 +114,7 @@ public class NotesFragment extends Fragment {
      * 从数据库中提取notes
      */
     private void getNotes() {
+        progressBar.setVisibility(View.VISIBLE);
         Bmob.initialize(getActivity(), Constants.APPLICATION_ID);
 
         BmobQuery<NoteItem> query = new BmobQuery<NoteItem>();
@@ -138,12 +141,13 @@ public class NotesFragment extends Fragment {
                 } else {
                     nodata.setVisibility(View.VISIBLE);
                 }
-
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onError(int code, String msg) {
                 nodata.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
                 Toast.makeText(getActivity(), "操作失败: " + msg, Toast.LENGTH_LONG).show();
             }
         });
@@ -161,6 +165,8 @@ public class NotesFragment extends Fragment {
         addBtn = (Button) root.findViewById(R.id.add_btn);
 
         etFilter = (EditText) root.findViewById(R.id.et_filter_string);
+
+
     }
 
 
