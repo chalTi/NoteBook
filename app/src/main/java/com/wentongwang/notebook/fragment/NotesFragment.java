@@ -213,6 +213,13 @@ public class NotesFragment extends Fragment {
                 startActivity(intent);
             }
         });
+        listView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                //TODO:长按删除
+                return false;
+            }
+        });
         etFilter.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

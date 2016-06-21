@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -44,20 +45,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
         setContentView(R.layout.login_activity_layout);
         initDatas();
-        autoLogin();
         initViews();
         initEvents();
-    }
-
-    private void autoLogin() {
-
-        if (SPUtils.contains(this, "user_name")) {
-
-            user_name = AccountUtils.getUserName(this);
-            pwd = AccountUtils.getUserPwd(this);
-
-            login();
-        }
     }
 
     private void initDatas() {
@@ -104,7 +93,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
                 User user = new User();
                 user = BmobUser.getCurrentUser(LoginActivity.this, User.class);
-
+                Log.i("xxxx", "user_sex " + user.getUser_sex() + "   diaryPwd "+ user.getUser_diraypwd());
                 AccountUtils.saveUserInfos(LoginActivity.this, user, pwd);
 
                 Intent it = new Intent();

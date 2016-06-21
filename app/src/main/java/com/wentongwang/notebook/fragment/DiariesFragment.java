@@ -1,7 +1,9 @@
 package com.wentongwang.notebook.fragment;
 
 import android.animation.ObjectAnimator;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -65,6 +67,8 @@ public class DiariesFragment extends Fragment {
     private EditText etFilter;
     //进度条
     private View progressBar;
+    //用户的日记密码
+    private String diaryPwd;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -99,10 +103,10 @@ public class DiariesFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getDiaries();
+        diaryPwd = AccountUtils.getUserDiaryPwd(getActivity());
     }
 
     private void initDatas() {
-
         diaryItems = new ArrayList<>();
     }
     /**
@@ -187,13 +191,12 @@ public class DiariesFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent();
-                intent.setClass(getActivity(), EditDiaryActivity.class);
+                if (diaryItems.get(position).isLockedInBoolean()) {
+                    checkDiaryPwd(diaryItems.get(position));
+                } else {
+                    startDiaryActivity(diaryItems.get(position));
+                }
 
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("my_diary", diaryItems.get(position));
-                intent.putExtras(bundle);
-                startActivity(intent);
             }
         });
 
@@ -225,7 +228,52 @@ public class DiariesFragment extends Fragment {
         });
     }
 
+    /**
+     * 判断是否可以进入加密的日记
+     */
+    private void checkDiaryPwd(final DiaryItem diaryItem) {
+        View layout;
+        final EditText et_pwd;
 
+        layout = LayoutInflater.from(getActivity()).inflate(R.layout.input_diarypwd_dialog_layout, null);
+        et_pwd = (EditText) layout.findViewById(R.id.et_input_diarypwd);
+
+        AlertDialog.Builder inputPwdBuilder = new AlertDialog.Builder(getActivity())
+                .setTitle("密码确认")
+                .setView(layout)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String pwd = et_pwd.getText().toString();
+                        if (pwd.equals(diaryPwd)) {
+                            startDiaryActivity(diaryItem);
+                        } else {
+                            Toast.makeText(getActivity(), "密码不正确，重新输入", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+        inputPwdBuilder.create().show();
+    }
+
+    /**
+     * 跳转到日记详情界面
+     * @param diaryItem
+     */
+    private void startDiaryActivity(DiaryItem diaryItem) {
+        Intent intent = new Intent();
+        intent.setClass(getActivity(), EditDiaryActivity.class);
+
+        Bundle bundle = new Bundle();
+        //传递该条目所对应的日记
+        bundle.putSerializable("my_diary", diaryItem);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
+    /**
+     * 隐藏按钮
+     * @param view
+     */
     private void hideBtnAnim(View view) {
         //获取按键初始化后在界面中的Y坐标
         int btnY = addBtn.getTop();
@@ -238,6 +286,10 @@ public class DiariesFragment extends Fragment {
 
     }
 
+    /**
+     * 显示按钮
+     * @param view
+     */
     private void showBtnAnim(View view){
         int btnY = addBtn.getTop();
 

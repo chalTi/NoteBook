@@ -16,9 +16,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,7 +27,6 @@ import com.wentongwang.notebook.model.User;
 import com.wentongwang.notebook.utils.AccountUtils;
 
 import java.io.FileNotFoundException;
-import java.net.URL;
 
 import cn.bmob.v3.listener.UpdateListener;
 
@@ -50,14 +47,17 @@ public class UserInfoActivity extends Activity {
     private TextView tvUserNickName;
     private TextView tvUserEmail;
     private TextView tvUserSex;
+    private TextView tvUserDiaryPwd;
 
     private String userName;
     private String userNickName;
     private String userEmail;
     private String userSex;
+    private String diarypwd;
+
 
     private PopupWindow mPopupWindow;
-    private PopupWindow window;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +74,7 @@ public class UserInfoActivity extends Activity {
         userNickName = AccountUtils.getUserNickName(this);
         userEmail = AccountUtils.getUserEmail(this);
         userSex = AccountUtils.getUserSex(this);
+        diarypwd = AccountUtils.getUserDiaryPwd(this);
     }
 
     private void initViews() {
@@ -109,7 +110,12 @@ public class UserInfoActivity extends Activity {
             tvUserSex.setText("男");
         }
 
-
+        tvUserDiaryPwd = (TextView) findViewById(R.id.tv_user_diarypwd);
+        if (!TextUtils.isEmpty(diarypwd) && !diarypwd.equals("")) {
+            tvUserDiaryPwd.setText(diarypwd);
+        } else {
+            tvUserDiaryPwd.setText("");
+        }
     }
 
     private void initEvents() {
@@ -122,80 +128,24 @@ public class UserInfoActivity extends Activity {
      * @param view
      */
     public void onClick(View view) {
-        //弹出对话框的部分
-        View layout;
-        final EditText et_pwd;
-        final EditText et_change;
         switch (view.getId()) {
             case R.id.to_change_user_nickname:
-                layout = getLayoutInflater().inflate(R.layout.change_info_dialog_layout, null);
-                et_pwd = (EditText) layout.findViewById(R.id.ed_pwd_confirm);
-                et_change = (EditText) layout.findViewById(R.id.ed_change_info);
-                et_change.setHint("新的昵称");
-                AlertDialog.Builder nicknameBuilder = new AlertDialog.Builder(UserInfoActivity.this)
-                        .setTitle("修改昵称")
-                        .setView(layout)
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String pwd = et_pwd.getText().toString();
-                                if (pwd.equals(AccountUtils.getUserPwd(UserInfoActivity.this))) {
-                                    userNickName = et_change.getText().toString();
-                                    upDateInfo(R.id.to_change_user_nickname, userNickName);
-                                } else {
-                                    Toast.makeText(UserInfoActivity.this, "密码不正确，重新输入", Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        });
-                nicknameBuilder.create().show();
+                toChangeUserNickName();
                 break;
             case R.id.to_change_user_email:
-                layout = getLayoutInflater().inflate(R.layout.change_info_dialog_layout, null);
-                et_pwd = (EditText) layout.findViewById(R.id.ed_pwd_confirm);
-                et_change = (EditText) layout.findViewById(R.id.ed_change_info);
-                et_change.setHint("新的邮箱");
-                AlertDialog.Builder emailBuilder = new AlertDialog.Builder(UserInfoActivity.this)
-                        .setTitle("修改邮箱")
-                        .setView(layout)
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String pwd = et_pwd.getText().toString();
-                                if (pwd.equals(AccountUtils.getUserPwd(UserInfoActivity.this))) {
-                                    userEmail = et_change.getText().toString();
-                                    upDateInfo(R.id.to_change_user_email, userEmail);
-                                } else {
-                                    Toast.makeText(UserInfoActivity.this, "密码不正确，重新输入", Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        });
-                emailBuilder.create().show();
+                toChangeUserEmail();
                 break;
             case R.id.to_change_user_sex:
-                final String[] sexItems = {"男", "女"};
-                AlertDialog.Builder sexBuilder = new AlertDialog.Builder(UserInfoActivity.this)
-                        .setTitle("选择性别")
-                        .setSingleChoiceItems(sexItems, 1, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                userSex = sexItems[which];
-                            }
-                        });
-                sexBuilder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        upDateInfo(R.id.to_change_user_sex, userSex);
-                    }
-                });
-                sexBuilder.create().show();
+                toChangeUserSex();
                 break;
             case R.id.to_change_user_diarypwd:
-
+                toChangeUserDiaryPwd();
                 break;
             case R.id.iv_back_btn:
                 onBackPressed();
                 break;
             case R.id.unregistre_btn:
+                //清除本地保存的用户信息
                 AccountUtils.clearAllInfos(UserInfoActivity.this);
                 Intent it = new Intent();
                 it.setClass(UserInfoActivity.this, LoginActivity.class);
@@ -208,17 +158,130 @@ public class UserInfoActivity extends Activity {
     }
 
     /**
+     * 改变用户日记锁密码
+     */
+    private void toChangeUserDiaryPwd() {
+        View layout;
+        final EditText et_pwd;
+        final EditText et_change;
+        //载入,初始化自定义对话框布局
+        layout = getLayoutInflater().inflate(R.layout.change_info_dialog_layout, null);
+        et_pwd = (EditText) layout.findViewById(R.id.ed_pwd_confirm);
+        et_change = (EditText) layout.findViewById(R.id.ed_change_info);
+        et_change.setHint("新的日记密码");
+        //设置对话框
+        AlertDialog.Builder diarypwdBuilder = new AlertDialog.Builder(UserInfoActivity.this)
+                .setTitle("修改日记密码")
+                .setView(layout)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String pwd = et_pwd.getText().toString();
+                        if (pwd.equals(AccountUtils.getUserPwd(UserInfoActivity.this))) {
+                            diarypwd = et_change.getText().toString();
+                            upDateInfo(R.id.to_change_user_diarypwd, diarypwd);
+                        } else {
+                            Toast.makeText(UserInfoActivity.this, "密码不正确，重新输入", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+        //弹出对话框
+        diarypwdBuilder.create().show();
+    }
+
+    /**
+     * 改变用户性别
+     */
+    private void toChangeUserSex() {
+        final String[] sexItems = {"男", "女"};
+        AlertDialog.Builder sexBuilder = new AlertDialog.Builder(UserInfoActivity.this)
+                .setTitle("选择性别")
+                .setSingleChoiceItems(sexItems, 1, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        userSex = sexItems[which];
+                    }
+                });
+        sexBuilder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                upDateInfo(R.id.to_change_user_sex, userSex);
+            }
+        });
+        sexBuilder.create().show();
+    }
+
+    /**
+     * 改变用户邮箱
+     */
+    private void toChangeUserEmail() {
+        View layout;
+        final EditText et_pwd;
+        final EditText et_change;
+
+        layout = getLayoutInflater().inflate(R.layout.change_info_dialog_layout, null);
+        et_pwd = (EditText) layout.findViewById(R.id.ed_pwd_confirm);
+        et_change = (EditText) layout.findViewById(R.id.ed_change_info);
+        et_change.setHint("新的邮箱");
+        AlertDialog.Builder emailBuilder = new AlertDialog.Builder(UserInfoActivity.this)
+                .setTitle("修改邮箱")
+                .setView(layout)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String pwd = et_pwd.getText().toString();
+                        if (pwd.equals(AccountUtils.getUserPwd(UserInfoActivity.this))) {
+                            userEmail = et_change.getText().toString();
+                            upDateInfo(R.id.to_change_user_email, userEmail);
+                        } else {
+                            Toast.makeText(UserInfoActivity.this, "密码不正确，重新输入", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+        emailBuilder.create().show();
+    }
+
+    /**
+     * 改变用户昵称
+     */
+    private void toChangeUserNickName() {
+        View layout;
+        final EditText et_pwd;
+        final EditText et_change;
+
+        layout = getLayoutInflater().inflate(R.layout.change_info_dialog_layout, null);
+        et_pwd = (EditText) layout.findViewById(R.id.ed_pwd_confirm);
+        et_change = (EditText) layout.findViewById(R.id.ed_change_info);
+        et_change.setHint("新的昵称");
+        AlertDialog.Builder nicknameBuilder = new AlertDialog.Builder(UserInfoActivity.this)
+                .setTitle("修改昵称")
+                .setView(layout)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String pwd = et_pwd.getText().toString();
+                        if (pwd.equals(AccountUtils.getUserPwd(UserInfoActivity.this))) {
+                            userNickName = et_change.getText().toString();
+                            upDateInfo(R.id.to_change_user_nickname, userNickName);
+                        } else {
+                            Toast.makeText(UserInfoActivity.this, "密码不正确，重新输入", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+        nicknameBuilder.create().show();
+    }
+
+    /**
      * 更新信息的网络请求
      *
-     * @param id
-     * @param data
+     * @param id 属于哪一个信息
+     * @param data 修改内容
      */
     private void upDateInfo(int id, String data) {
         User p = new User();
         switch (id) {
             case R.id.to_change_user_nickname:
                 p.setUser_nickname(data);
-
                 break;
             case R.id.to_change_user_email:
                 p.setEmail(data);
@@ -233,6 +296,7 @@ public class UserInfoActivity extends Activity {
         p.update(this, AccountUtils.getUserId(this), new UpdateListener() {
             @Override
             public void onSuccess() {
+                Toast.makeText(UserInfoActivity.this, "修改成功!", Toast.LENGTH_LONG).show();
                 notifyChanges();
             }
 
@@ -272,6 +336,11 @@ public class UserInfoActivity extends Activity {
         } else {
             tvUserSex.setText("男");
         }
+
+        if (!TextUtils.isEmpty(diarypwd) && !diarypwd.equals("")) {
+            tvUserDiaryPwd.setText(diarypwd);
+            AccountUtils.saveUserDiaryPwd(this, diarypwd);
+        }
     }
 
 
@@ -283,17 +352,17 @@ public class UserInfoActivity extends Activity {
         View view = getLayoutInflater().inflate(R.layout.popupwindow_choose_layout, null);
 
         // 下面是两种方法得到宽度和高度 getWindow().getDecorView().getWidth()
-        window = new PopupWindow(view, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        mPopupWindow = new PopupWindow(view, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
 
         // 设置popWindow弹出窗体可点击，这句话必须添加，并且是true
-        window.setFocusable(true);
+        mPopupWindow.setFocusable(true);
 
         // 实例化一个ColorDrawable颜色为半透明
         ColorDrawable dw = new ColorDrawable(0xb0000000);
-        window.setBackgroundDrawable(dw);
+        mPopupWindow.setBackgroundDrawable(dw);
 
         // 设置popWindow的显示和消失动画
-        window.setAnimationStyle(R.style.mypopwindow_anim_style);
+        mPopupWindow.setAnimationStyle(R.style.mypopwindow_anim_style);
 
         // 这里检验popWindow里的button是否可以点击
         TextView album = (TextView) view.findViewById(R.id.go_to_album);
@@ -302,12 +371,12 @@ public class UserInfoActivity extends Activity {
             @Override
             public void onClick(View v) {
                 getImageFromAlbum();
-                window.dismiss();
+                mPopupWindow.dismiss();
             }
         });
 
         // 在底部显示
-        window.showAtLocation(rootview, Gravity.BOTTOM, 0, 0);
+        mPopupWindow.showAtLocation(rootview, Gravity.BOTTOM, 0, 0);
     }
 
     /**
@@ -325,18 +394,21 @@ public class UserInfoActivity extends Activity {
         Log.e("xxxx", "url = " + data.getData());
         Uri url = data.getData();
         if (url != null) {
+            //通过url返回
             ContentResolver cr = this.getContentResolver();
             try {
+                //从url中获取图片
                 Bitmap bitmap = BitmapFactory.decodeStream(cr.openInputStream(url));
                 userHead.setImage(bitmap);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
         } else {
-            //use bundle to get data
+            //通过intent中的bundle返回
             Bundle bundle = data.getExtras();
             if (bundle != null) {
                 Bitmap bitmap = (Bitmap) bundle.get("data");
+                userHead.setImage(bitmap);
             } else {
                 Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_LONG).show();
             }

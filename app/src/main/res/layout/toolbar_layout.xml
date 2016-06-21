@@ -36,7 +36,7 @@
             android:layout_weight="1"
             android:layout_height="30dp"
             android:layout_gravity="center"
-            android:src="@drawable/confirm"
+            android:src="@drawable/lock"
             android:visibility="invisible"/>
     </LinearLayout>
 

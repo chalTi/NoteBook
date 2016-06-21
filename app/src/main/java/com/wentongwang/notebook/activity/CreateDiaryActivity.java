@@ -33,33 +33,52 @@ import cn.bmob.v3.listener.SaveListener;
  * Created by Wentong WANG on 2016/6/6.
  */
 public class CreateDiaryActivity  extends Activity {
-
+    //顶部toolbar部分
     private View toolbar;
     private TextView title;
     private ImageView leftBtn;
+    private ImageView rightBtn;
+    //创建日记的按钮
     private Button confirmBtn;
-
+    //日记部分
     private EditText titleText;
     private EditText contentText;
+    private boolean isLocked = false;
 
     //进度条
     private View progressBar;
+    //上锁和不上锁的两个图片
+    private Bitmap nolock;
+    private Bitmap lock;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_diary_activity_layout);
 //        Bmob.initialize(this, Constants.APPLICATION_ID);
+        initDatas();
         initViews();
         initEvents();
+    }
+
+    private void initDatas() {
+        nolock = BitmapFactory.decodeResource(getResources(), R.drawable.nolock);
+        lock = BitmapFactory.decodeResource(getResources(), R.drawable.lock);
     }
 
     private void initViews() {
         toolbar = findViewById(R.id.top_toolbar);
         title = (TextView) toolbar.findViewById(R.id.title);
         title.setText("创建新的日记");
+        //设置左侧返回按钮
         leftBtn = (ImageView) toolbar.findViewById(R.id.left_btn);
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.back_btn);
         leftBtn.setImageBitmap(bitmap);
+        //设置toolbar右侧加锁按钮
+        rightBtn = (ImageView) toolbar.findViewById(R.id.right_btn);
+
+        rightBtn.setImageBitmap(nolock);
+        rightBtn.setVisibility(View.VISIBLE);
 
         confirmBtn = (Button) findViewById(R.id.confirm_btn);
 
@@ -78,7 +97,20 @@ public class CreateDiaryActivity  extends Activity {
                 onBackPressed();
             }
         });
-
+        rightBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isLocked) {
+                    isLocked = false;
+                    rightBtn.setImageBitmap(nolock);
+                    Toast.makeText(CreateDiaryActivity.this, "日记已解锁", Toast.LENGTH_SHORT).show();
+                } else {
+                    isLocked = true;
+                    rightBtn.setImageBitmap(lock);
+                    Toast.makeText(CreateDiaryActivity.this, "日记已上锁", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         confirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,7 +126,7 @@ public class CreateDiaryActivity  extends Activity {
                 diaryItem.setDiary_date(sdf.format(new Date()));
                 diaryItem.setDiary_title(diary_title);
                 diaryItem.setDiary_content(diary_content);
-                diaryItem.setIsLocked(false);
+                diaryItem.setIsLocked(isLocked);
                 diaryItem.setDiary_user_id(AccountUtils.getUserId(CreateDiaryActivity.this));
                 diaryItem.save(CreateDiaryActivity.this, new SaveListener() {
                     @Override

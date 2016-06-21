@@ -198,6 +198,7 @@
                 android:layout_weight="5"
                 android:paddingBottom="5dp"
                 android:paddingTop="5dp"
+                android:inputType="textPassword"
                 android:text="日记密码"
                 android:textSize="20sp" />
 

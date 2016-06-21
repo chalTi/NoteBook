@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
+import android.util.Log;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -117,6 +118,7 @@ public class SplashActivity extends Activity {
 
                 User user = new User();
                 user = BmobUser.getCurrentUser(SplashActivity.this, User.class);
+                Log.i("xxxx", "user_sex " + user.getUser_sex() + "   diaryPwd " + user.getUser_diraypwd());
                 //将用户信息保存本地
                 AccountUtils.saveUserInfos(SplashActivity.this, user, pwd);
 
