@@ -1,4 +1,4 @@
-package com.wentongwang.notebook.custome;
+package com.wentongwang.notebook.view.custome;
 
 import android.content.Context;
 import android.content.res.TypedArray;

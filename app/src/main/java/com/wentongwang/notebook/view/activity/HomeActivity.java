@@ -1,4 +1,4 @@
-package com.wentongwang.notebook.activity;
+package com.wentongwang.notebook.view.activity;
 
 
 import android.content.Intent;
@@ -9,24 +9,22 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
-import com.wentongwang.notebook.custome.CircleImageView;
-import com.wentongwang.notebook.fragment.DiariesFragment;
-import com.wentongwang.notebook.fragment.NotesFragment;
-import com.wentongwang.notebook.model.NoteItem;
-import com.wentongwang.notebook.model.User;
+import com.wentongwang.notebook.view.custome.CircleImageView;
+import com.wentongwang.notebook.view.fragment.DiariesFragment;
+import com.wentongwang.notebook.view.fragment.NotesFragment;
 import com.wentongwang.notebook.utils.AccountUtils;
 
 
 import java.util.ArrayList;
 import java.util.List;
-
-import cn.bmob.v3.BmobUser;
 
 public class HomeActivity extends FragmentActivity implements View.OnClickListener {
 
@@ -145,6 +143,9 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         }
     }
 
+    /**
+     * 显示便笺列表界面
+     */
     private void showNotesFragment() {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
@@ -152,10 +153,28 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         transaction.commit();
     }
 
+    /**
+     * 显示日记列表界面
+     */
     private void showDiariesFragment() {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.replace(R.id.home_activity_container, diariesFragment);
         transaction.commit();
+    }
+
+    private long mExitTime = 0;
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if ((System.currentTimeMillis() - mExitTime) > 2000) {
+                Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                mExitTime = System.currentTimeMillis();
+            } else {
+                finish();
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

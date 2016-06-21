@@ -1,4 +1,4 @@
-package com.wentongwang.notebook.fragment;
+package com.wentongwang.notebook.view.fragment;
 
 import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
@@ -26,14 +26,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
-import com.wentongwang.notebook.activity.CreateDiaryActivity;
-import com.wentongwang.notebook.activity.EditDiaryActivity;
+import com.wentongwang.notebook.view.activity.CreateDiaryActivity;
+import com.wentongwang.notebook.view.activity.EditDiaryActivity;
 import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.DiaryItem;
-import com.wentongwang.notebook.model.NoteItem;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.utils.AccountUtils;
-import com.wentongwang.notebook.utils.SPUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

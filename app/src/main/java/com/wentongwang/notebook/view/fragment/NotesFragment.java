@@ -1,4 +1,4 @@
-package com.wentongwang.notebook.fragment;
+package com.wentongwang.notebook.view.fragment;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
@@ -19,14 +19,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
-import com.wentongwang.notebook.activity.CreateNoteActivity;
-import com.wentongwang.notebook.activity.EditNoteActivity;
+import com.wentongwang.notebook.view.activity.CreateNoteActivity;
+import com.wentongwang.notebook.view.activity.EditNoteActivity;
 import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.NoteItem;
 import com.wentongwang.notebook.model.UpdataEvent;

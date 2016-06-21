@@ -22,31 +22,31 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.SplashActivity">
+        <activity android:name=".view.activity.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.LoginActivity"/>
-        <activity android:name=".activity.SignUpActivity"/>
-        <activity android:name=".activity.HomeActivity"
+        <activity android:name=".view.activity.LoginActivity"/>
+        <activity android:name=".view.activity.SignUpActivity"/>
+        <activity android:name=".view.activity.HomeActivity"
             android:windowSoftInputMode="stateHidden|adjustResize"
             />
-        <activity android:name=".activity.CreateNoteActivity"
+        <activity android:name=".view.activity.CreateNoteActivity"
             android:windowSoftInputMode="stateVisible|adjustResize"
             />
-        <activity android:name=".activity.EditNoteActivity"
+        <activity android:name=".view.activity.EditNoteActivity"
             android:windowSoftInputMode="stateHidden|adjustResize"
             />
-        <activity android:name=".activity.EditDiaryActivity"
+        <activity android:name=".view.activity.EditDiaryActivity"
             android:windowSoftInputMode="stateHidden|adjustResize"/>
 
-        <activity android:name=".activity.CreateDiaryActivity"
+        <activity android:name=".view.activity.CreateDiaryActivity"
             android:windowSoftInputMode="stateVisible|adjustResize"
             />
-        <activity android:name=".activity.UserInfoActivity"/>
+        <activity android:name=".view.activity.UserInfoActivity"/>
     </application>
 
 </manifest>

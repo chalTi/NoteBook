@@ -5,7 +5,7 @@
     android:background="#455A64">
 
 
-    <com.wentongwang.notebook.custome.CircleImageView
+    <com.wentongwang.notebook.view.custome.CircleImageView
         android:id="@+id/iv_left_menu_user_head"
         android:layout_width="100dp"
         android:layout_height="100dp"

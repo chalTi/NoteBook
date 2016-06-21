@@ -1,12 +1,10 @@
-package com.wentongwang.notebook.activity;
+package com.wentongwang.notebook.view.activity;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -18,7 +16,6 @@ import android.widget.Toast;
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.NoteItem;
 import com.wentongwang.notebook.model.UpdataEvent;
-import com.wentongwang.notebook.utils.DatabaseUtils;
 
 import org.greenrobot.eventbus.EventBus;
 

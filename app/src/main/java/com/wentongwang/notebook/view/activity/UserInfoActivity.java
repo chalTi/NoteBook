@@ -1,4 +1,4 @@
-package com.wentongwang.notebook.activity;
+package com.wentongwang.notebook.view.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -22,7 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
-import com.wentongwang.notebook.custome.CircleImageView;
+import com.wentongwang.notebook.view.custome.CircleImageView;
 import com.wentongwang.notebook.model.User;
 import com.wentongwang.notebook.utils.AccountUtils;
 

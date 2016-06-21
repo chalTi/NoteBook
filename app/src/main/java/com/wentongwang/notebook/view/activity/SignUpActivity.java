@@ -1,4 +1,4 @@
-package com.wentongwang.notebook.activity;
+package com.wentongwang.notebook.view.activity;
 
 import android.app.Activity;
 import android.content.Intent;

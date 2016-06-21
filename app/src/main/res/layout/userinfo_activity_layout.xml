@@ -21,7 +21,7 @@
         android:orientation="vertical"
         android:showDividers="middle">
 
-        <com.wentongwang.notebook.custome.CircleImageView
+        <com.wentongwang.notebook.view.custome.CircleImageView
             android:id="@+id/iv_user_head"
             android:layout_width="70dp"
             android:layout_height="70dp"
