@@ -1,29 +1,20 @@
 package com.wentongwang.notebook.view.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.Constants;
-import com.wentongwang.notebook.model.User;
 import com.wentongwang.notebook.presenters.SplashPresenter;
-import com.wentongwang.notebook.utils.AccountUtils;
-import com.wentongwang.notebook.utils.MD5Util;
-import com.wentongwang.notebook.utils.SPUtils;
 import com.wentongwang.notebook.view.activity.interfaces.SplashView;
 
 import cn.bmob.v3.Bmob;
-import cn.bmob.v3.BmobUser;
-import cn.bmob.v3.listener.SaveListener;
 
 /**
  * 欢迎界面
@@ -51,10 +42,11 @@ public class SplashActivity extends BaseActivity implements SplashView{
     protected int getLayoutId() {
         return R.layout.splash_activity_layout;
     }
+    @Override
     protected void initDatas() {
         Bmob.initialize(this, Constants.APPLICATION_ID);
     }
-
+    @Override
     protected void initViews() {
         root = (RelativeLayout) findViewById(R.id.splash_root);
         initAnimation();

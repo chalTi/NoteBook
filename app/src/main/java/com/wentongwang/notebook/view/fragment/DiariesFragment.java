@@ -67,10 +67,13 @@ public class DiariesFragment extends Fragment {
     private View progressBar;
     //用户的日记密码
     private String diaryPwd;
+    //用于第一次进来获取数据，之后恢复时都不需要获取
+    private boolean update;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         EventBus.getDefault().register(this);
+        update = true;
     }
 
     @Subscribe
@@ -100,7 +103,9 @@ public class DiariesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        getDiaries();
+        if (update) {
+            getDiaries();
+        }
         diaryPwd = AccountUtils.getUserDiaryPwd(getActivity());
     }
 
@@ -138,10 +143,12 @@ public class DiariesFragment extends Fragment {
                     nodata.setVisibility(View.VISIBLE);
                 }
                 progressBar.setVisibility(View.GONE);
+                update = false;
             }
 
             @Override
             public void onError(int code, String msg) {
+                update = true;
                 progressBar.setVisibility(View.GONE);
                 nodata.setVisibility(View.VISIBLE);
                 Toast.makeText(getActivity(), "操作失败: " + msg, Toast.LENGTH_LONG).show();

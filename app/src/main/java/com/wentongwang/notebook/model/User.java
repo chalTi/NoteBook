@@ -14,6 +14,7 @@ public class User extends BmobUser implements Serializable{
     private String user_nickname;
     private String user_sex;
     private String user_diraypwd;
+    private String user_head_url;
 
     public String getUser_nickname() {
         if (!TextUtils.isEmpty(user_nickname))
@@ -46,5 +47,16 @@ public class User extends BmobUser implements Serializable{
 
     public void setUser_diraypwd(String user_diraypwd) {
         this.user_diraypwd = user_diraypwd;
+    }
+
+    public String getUser_head_url() {
+        if (!TextUtils.isEmpty(user_head_url))
+            return user_head_url;
+        else
+            return "";
+    }
+
+    public void setUser_head_url(String user_head_url) {
+        this.user_head_url = user_head_url;
     }
 }

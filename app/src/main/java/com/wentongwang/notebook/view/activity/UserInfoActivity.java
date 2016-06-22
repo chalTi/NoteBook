@@ -2,7 +2,7 @@ package com.wentongwang.notebook.view.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -22,23 +22,32 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
+import com.wentongwang.notebook.model.UpdataEvent;
+import com.wentongwang.notebook.presenters.UserInfoPresenter;
+import com.wentongwang.notebook.utils.ImageLoader;
+import com.wentongwang.notebook.utils.MyToast;
+import com.wentongwang.notebook.view.activity.interfaces.UserInfoView;
 import com.wentongwang.notebook.view.custome.CircleImageView;
 import com.wentongwang.notebook.model.User;
 import com.wentongwang.notebook.utils.AccountUtils;
 
-import java.io.FileNotFoundException;
+import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import cn.bmob.v3.datatype.BmobFile;
+import cn.bmob.v3.listener.DeleteListener;
 import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * 个人信息界面
  * Created by Wentong WANG on 2016/6/7.
  */
-public class UserInfoActivity extends Activity {
+public class UserInfoActivity extends Activity implements UserInfoView{
 
-    //    private ImageView backBtn;
-//
-//    private Button logout;
     private View rootview;
 
     private CircleImageView userHead;
@@ -49,14 +58,16 @@ public class UserInfoActivity extends Activity {
     private TextView tvUserSex;
     private TextView tvUserDiaryPwd;
 
-    private String userName;
-    private String userNickName;
-    private String userEmail;
     private String userSex;
-    private String diarypwd;
+
 
 
     private PopupWindow mPopupWindow;
+
+    private View progressBar;
+
+    private UserInfoPresenter mPresenter = new UserInfoPresenter(this);
+
 
 
     @Override
@@ -69,53 +80,21 @@ public class UserInfoActivity extends Activity {
     }
 
     private void initDatas() {
-//        Bmob.initialize(this, Constants.APPLICATION_ID);
-        userName = AccountUtils.getUserName(this);
-        userNickName = AccountUtils.getUserNickName(this);
-        userEmail = AccountUtils.getUserEmail(this);
-        userSex = AccountUtils.getUserSex(this);
-        diarypwd = AccountUtils.getUserDiaryPwd(this);
+
     }
 
     private void initViews() {
+        progressBar = findViewById(R.id.progress_bar);
+
         rootview = findViewById(R.id.userinfo_root_view);
-//        backBtn = (ImageView) findViewById(R.id.iv_back_btn);
-//
-//        logout = (Button) findViewById(R.id.unregistre_btn);
-
         userHead = (CircleImageView) findViewById(R.id.iv_user_head);
-        userHead.setImage(R.drawable.user_head_defaut);
-
         tvUserName = (TextView) findViewById(R.id.tv_user_name);
-        tvUserName.setText(userName);
-
         tvUserNickName = (TextView) findViewById(R.id.tv_user_nickname);
-        if (!TextUtils.isEmpty(userNickName) && !userNickName.equals("")) {
-            tvUserNickName.setText(userNickName);
-        } else {
-            tvUserNickName.setText(userName);
-        }
-
         tvUserEmail = (TextView) findViewById(R.id.tv_user_email);
-        if (!TextUtils.isEmpty(userEmail) && !userEmail.equals("")) {
-            tvUserEmail.setText(userEmail);
-        } else {
-            tvUserEmail.setText("您还没绑定你的邮箱");
-        }
-
         tvUserSex = (TextView) findViewById(R.id.tv_user_sex);
-        if (!TextUtils.isEmpty(userSex) && !userSex.equals("")) {
-            tvUserSex.setText(userSex);
-        } else {
-            tvUserSex.setText("男");
-        }
-
         tvUserDiaryPwd = (TextView) findViewById(R.id.tv_user_diarypwd);
-        if (!TextUtils.isEmpty(diarypwd) && !diarypwd.equals("")) {
-            tvUserDiaryPwd.setText(diarypwd);
-        } else {
-            tvUserDiaryPwd.setText("");
-        }
+
+        mPresenter.setUserInfo();
     }
 
     private void initEvents() {
@@ -130,37 +109,61 @@ public class UserInfoActivity extends Activity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.to_change_user_nickname:
-                toChangeUserNickName();
+                changeUserNickName();
                 break;
             case R.id.to_change_user_email:
-                toChangeUserEmail();
+                changeUserEmail();
                 break;
             case R.id.to_change_user_sex:
-                toChangeUserSex();
+                changeUserSex();
                 break;
             case R.id.to_change_user_diarypwd:
-                toChangeUserDiaryPwd();
+                changeUserDiaryPwd();
                 break;
             case R.id.iv_back_btn:
                 onBackPressed();
                 break;
             case R.id.unregistre_btn:
                 //清除本地保存的用户信息
-                AccountUtils.clearAllInfos(UserInfoActivity.this);
-                Intent it = new Intent();
-                it.setClass(UserInfoActivity.this, LoginActivity.class);
-                startActivity(it);
+                mPresenter.logout();
                 break;
             case R.id.iv_user_head:
                 showPopwindow();
                 break;
         }
     }
+    /**
+     * 更改用户昵称
+     */
+    public void changeUserNickName() {
+        View layout;
+        final EditText et_pwd;
+        final EditText et_change;
 
+        layout = getLayoutInflater().inflate(R.layout.change_info_dialog_layout, null);
+        et_pwd = (EditText) layout.findViewById(R.id.ed_pwd_confirm);
+        et_change = (EditText) layout.findViewById(R.id.ed_change_info);
+        et_change.setHint("新的昵称");
+        AlertDialog.Builder nicknameBuilder = new AlertDialog.Builder(UserInfoActivity.this)
+                .setTitle("修改昵称")
+                .setView(layout)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String pwd = et_pwd.getText().toString();
+                        if (pwd.equals(AccountUtils.getUserPwd(UserInfoActivity.this))) {
+                            mPresenter.upDateInfo(UserInfoPresenter.UPDATE_USER_NICKNAME, et_change.getText().toString());
+                        } else {
+                            MyToast.showLong(UserInfoActivity.this, "密码错误");
+                        }
+                    }
+                });
+        nicknameBuilder.create().show();
+    }
     /**
      * 改变用户日记锁密码
      */
-    private void toChangeUserDiaryPwd() {
+    private void changeUserDiaryPwd() {
         View layout;
         final EditText et_pwd;
         final EditText et_change;
@@ -178,8 +181,7 @@ public class UserInfoActivity extends Activity {
                     public void onClick(DialogInterface dialog, int which) {
                         String pwd = et_pwd.getText().toString();
                         if (pwd.equals(AccountUtils.getUserPwd(UserInfoActivity.this))) {
-                            diarypwd = et_change.getText().toString();
-                            upDateInfo(R.id.to_change_user_diarypwd, diarypwd);
+                            mPresenter.upDateInfo(UserInfoPresenter.UPDATE_USER_DIARYPWD, et_change.getText().toString());
                         } else {
                             Toast.makeText(UserInfoActivity.this, "密码不正确，重新输入", Toast.LENGTH_LONG).show();
                         }
@@ -192,7 +194,7 @@ public class UserInfoActivity extends Activity {
     /**
      * 改变用户性别
      */
-    private void toChangeUserSex() {
+    private void changeUserSex() {
         final String[] sexItems = {"男", "女"};
         AlertDialog.Builder sexBuilder = new AlertDialog.Builder(UserInfoActivity.this)
                 .setTitle("选择性别")
@@ -205,7 +207,7 @@ public class UserInfoActivity extends Activity {
         sexBuilder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                upDateInfo(R.id.to_change_user_sex, userSex);
+                mPresenter.upDateInfo(UserInfoPresenter.UPDATE_USER_SEX, userSex);
             }
         });
         sexBuilder.create().show();
@@ -214,7 +216,7 @@ public class UserInfoActivity extends Activity {
     /**
      * 改变用户邮箱
      */
-    private void toChangeUserEmail() {
+    private void changeUserEmail() {
         View layout;
         final EditText et_pwd;
         final EditText et_change;
@@ -231,8 +233,7 @@ public class UserInfoActivity extends Activity {
                     public void onClick(DialogInterface dialog, int which) {
                         String pwd = et_pwd.getText().toString();
                         if (pwd.equals(AccountUtils.getUserPwd(UserInfoActivity.this))) {
-                            userEmail = et_change.getText().toString();
-                            upDateInfo(R.id.to_change_user_email, userEmail);
+                            mPresenter.upDateInfo(UserInfoPresenter.UPDATE_USER_EMAIL, et_change.getText().toString());
                         } else {
                             Toast.makeText(UserInfoActivity.this, "密码不正确，重新输入", Toast.LENGTH_LONG).show();
                         }
@@ -240,109 +241,6 @@ public class UserInfoActivity extends Activity {
                 });
         emailBuilder.create().show();
     }
-
-    /**
-     * 改变用户昵称
-     */
-    private void toChangeUserNickName() {
-        View layout;
-        final EditText et_pwd;
-        final EditText et_change;
-
-        layout = getLayoutInflater().inflate(R.layout.change_info_dialog_layout, null);
-        et_pwd = (EditText) layout.findViewById(R.id.ed_pwd_confirm);
-        et_change = (EditText) layout.findViewById(R.id.ed_change_info);
-        et_change.setHint("新的昵称");
-        AlertDialog.Builder nicknameBuilder = new AlertDialog.Builder(UserInfoActivity.this)
-                .setTitle("修改昵称")
-                .setView(layout)
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String pwd = et_pwd.getText().toString();
-                        if (pwd.equals(AccountUtils.getUserPwd(UserInfoActivity.this))) {
-                            userNickName = et_change.getText().toString();
-                            upDateInfo(R.id.to_change_user_nickname, userNickName);
-                        } else {
-                            Toast.makeText(UserInfoActivity.this, "密码不正确，重新输入", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-        nicknameBuilder.create().show();
-    }
-
-    /**
-     * 更新信息的网络请求
-     *
-     * @param id 属于哪一个信息
-     * @param data 修改内容
-     */
-    private void upDateInfo(int id, String data) {
-        User p = new User();
-        switch (id) {
-            case R.id.to_change_user_nickname:
-                p.setUser_nickname(data);
-                break;
-            case R.id.to_change_user_email:
-                p.setEmail(data);
-                break;
-            case R.id.to_change_user_sex:
-                p.setUser_sex(data);
-                break;
-            case R.id.to_change_user_diarypwd:
-                p.setUser_diraypwd(data);
-                break;
-        }
-        p.update(this, AccountUtils.getUserId(this), new UpdateListener() {
-            @Override
-            public void onSuccess() {
-                Toast.makeText(UserInfoActivity.this, "修改成功!", Toast.LENGTH_LONG).show();
-                notifyChanges();
-            }
-
-            @Override
-            public void onFailure(int code, String msg) {
-                Toast.makeText(UserInfoActivity.this, "修改失败: " + msg, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    /**
-     * 通知Ui界面改变
-     */
-    private void notifyChanges() {
-        userHead.setImage(R.drawable.user_head_defaut);
-
-        tvUserName.setText(userName);
-        AccountUtils.saveUserName(this, userName);
-
-        if (!TextUtils.isEmpty(userNickName) && !userNickName.equals("")) {
-            tvUserNickName.setText(userNickName);
-            AccountUtils.saveUserNickName(this, userNickName);
-        } else {
-            tvUserNickName.setText(userName);
-        }
-
-        if (!TextUtils.isEmpty(userEmail) && !userEmail.equals("")) {
-            tvUserEmail.setText(userEmail);
-            AccountUtils.saveUserEmail(this, userEmail);
-        } else {
-            tvUserEmail.setText("您还没绑定你的邮箱");
-        }
-
-        if (!TextUtils.isEmpty(userSex) && !userSex.equals("")) {
-            tvUserSex.setText(userSex);
-            AccountUtils.saveUserSex(this, userSex);
-        } else {
-            tvUserSex.setText("男");
-        }
-
-        if (!TextUtils.isEmpty(diarypwd) && !diarypwd.equals("")) {
-            tvUserDiaryPwd.setText(diarypwd);
-            AccountUtils.saveUserDiaryPwd(this, diarypwd);
-        }
-    }
-
 
     /**
      * 显示popupWindow
@@ -367,7 +265,6 @@ public class UserInfoActivity extends Activity {
         // 这里检验popWindow里的button是否可以点击
         TextView album = (TextView) view.findViewById(R.id.go_to_album);
         album.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 getImageFromAlbum();
@@ -379,40 +276,216 @@ public class UserInfoActivity extends Activity {
         mPopupWindow.showAtLocation(rootview, Gravity.BOTTOM, 0, 0);
     }
 
+    private static final int PHOTO_ALBUM = 1;
+    private static final int CROP_PHOTO = 2;
     /**
      * 从相册中获取图片
      */
     protected void getImageFromAlbum() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-        startActivityForResult(intent, 1);
+        startActivityForResult(intent, PHOTO_ALBUM);
     }
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.e("xxxx", "url = " + data.getData());
-        Uri url = data.getData();
-        if (url != null) {
-            //通过url返回
-            ContentResolver cr = this.getContentResolver();
-            try {
-                //从url中获取图片
-                Bitmap bitmap = BitmapFactory.decodeStream(cr.openInputStream(url));
-                userHead.setImage(bitmap);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        } else {
-            //通过intent中的bundle返回
-            Bundle bundle = data.getExtras();
-            if (bundle != null) {
-                Bitmap bitmap = (Bitmap) bundle.get("data");
-                userHead.setImage(bitmap);
-            } else {
-                Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_LONG).show();
-            }
+        switch (requestCode) {
+            case PHOTO_ALBUM:
+                if (resultCode == RESULT_OK) {
+                    Log.e("xxxx", "url = " + data.getData());
+                    Uri url = data.getData();
+                    if (url != null) {
+                        //通过url返回
+//                    ContentResolver cr = this.getContentResolver();
+//                    try {
+//                        //从url中获取图片
+//                        Bitmap bitmap = BitmapFactory.decodeStream(cr.openInputStream(url));
+//                        userHead.setImage(bitmap);
+//                    } catch (FileNotFoundException e) {
+//                        e.printStackTrace();
+//                    }
+                        //从url中获取图片
+                        cropImage(url, 500, 500, CROP_PHOTO);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "未能获取到图片", Toast.LENGTH_LONG).show();
+                    }
+                }
+                break;
+            case CROP_PHOTO:
+                Bitmap photo = null;
+                Uri photourl = data.getData();
+                if (photourl != null) {
+                    photo = BitmapFactory.decodeFile(photourl.getPath());
+                } else {
+                    Bundle extra = data.getExtras();
+                    if (extra != null) {
+                        photo = (Bitmap) extra.get("data");
+                        File f = new File(getCacheDir(), "userHead");
+                        if (f.exists()) {
+                            f.delete();
+                        }
+                        mPresenter.uploadUserHead(f,photo);
+                    }
+                }
+                break;
         }
 
+
     }
+
+    /**
+     * 图片的裁剪
+     *
+     * @param uri 图片URL
+     * @param outputX 图片输出大小
+     * @param outputY 图片输出大小
+     * @param requestCode 请求码
+     */
+    private void cropImage(Uri uri, int outputX, int outputY, int requestCode) {
+        //裁剪图片意图
+        Intent intent = new Intent("com.android.camera.action.CROP");
+        intent.setDataAndType(uri, "image/*");
+        intent.putExtra("crop", "true");
+        //裁剪框的比例，1：1
+        intent.putExtra("aspectX", 1);
+        intent.putExtra("aspectY", 1);
+        //裁剪后输出图片的尺寸大小
+        intent.putExtra("outputX", outputX);
+        intent.putExtra("outputY", outputY);
+        //图片格式
+        intent.putExtra("outputFormat", "JPEG");
+        intent.putExtra("noFaceDetection", true);
+        intent.putExtra("return-data", true);
+        startActivityForResult(intent, requestCode);
+    }
+
+    @Override
+    public Context getMyContext() {
+        return UserInfoActivity.this;
+    }
+
+    /**
+     * 设置用户名
+     *
+     * @param userName
+     */
+    @Override
+    public void setUserName(String userName) {
+        tvUserName.setText(userName);
+    }
+
+    /**
+     * 设置用户昵称
+     *
+     * @param userNickName
+     */
+    @Override
+    public void setUserNickName(String userNickName) {
+        if (!TextUtils.isEmpty(userNickName) && !userNickName.equals("")) {
+            tvUserNickName.setText(userNickName);
+        } else {
+            tvUserNickName.setText(userNickName);
+        }
+    }
+
+    /**
+     * 设置用户邮箱
+     *
+     * @param email
+     */
+    @Override
+    public void setUserEmail(String email) {
+        if (!TextUtils.isEmpty(email) && !email.equals("")) {
+            tvUserEmail.setText(email);
+        } else {
+            tvUserEmail.setText("您还没绑定你的邮箱");
+        }
+    }
+
+    /**
+     * 设置用户性别
+     *
+     * @param sex
+     */
+    @Override
+    public void setUserSex(String sex) {
+        if (!TextUtils.isEmpty(sex) && !sex.equals("")) {
+            tvUserSex.setText(sex);
+        } else {
+            tvUserSex.setText("男");
+        }
+    }
+
+    /**
+     * 设置日记密码
+     *
+     * @param pwd
+     */
+    @Override
+    public void setUserDiaryPwd(String pwd) {
+        if (!TextUtils.isEmpty(pwd) && !pwd.equals("")) {
+            tvUserDiaryPwd.setText(pwd);
+        } else {
+            tvUserDiaryPwd.setText("");
+        }
+    }
+
+    /**
+     * 设置用户头像
+     */
+    @Override
+    public void setUserHead(Bitmap bitmap) {
+        if (bitmap != null) {
+            userHead.setImage(bitmap);
+        }
+    }
+
+    /**
+     * 跳转到登录界面
+     */
+    @Override
+    public void goToLoginActivity() {
+        Intent it = new Intent();
+        it.setClass(UserInfoActivity.this, LoginActivity.class);
+        startActivity(it);
+    }
+
+    /**
+     * 显示进度条
+     */
+    @Override
+    public void showProgressBar() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * 隐藏进度条
+     */
+    @Override
+    public void hideProgressBar() {
+        progressBar.setVisibility(View.GONE);
+    }
+
+    /**
+     * 获取缓存文件夹目录
+     *
+     * @return
+     */
+    @Override
+    public String getCachePath() {
+        return getCacheDir().getAbsolutePath();
+    }
+
+    /**
+     * 刷新其他界面的头像
+     */
+    @Override
+    public void toUpdateUserHead() {
+        UpdataEvent event = new UpdataEvent();
+        event.setType(UpdataEvent.UPDATE_USER_INFOS);
+        EventBus.getDefault().post(event);
+    }
+
+
 }

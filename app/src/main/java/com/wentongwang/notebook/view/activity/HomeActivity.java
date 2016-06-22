@@ -2,6 +2,7 @@ package com.wentongwang.notebook.view.activity;
 
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -9,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -17,11 +19,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
+import com.wentongwang.notebook.model.UpdataEvent;
+import com.wentongwang.notebook.utils.ImageLoader;
 import com.wentongwang.notebook.view.custome.CircleImageView;
 import com.wentongwang.notebook.view.fragment.DiariesFragment;
 import com.wentongwang.notebook.view.fragment.NotesFragment;
 import com.wentongwang.notebook.utils.AccountUtils;
 
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,10 +48,22 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
 
     private String user_nickname;
     //左侧菜单栏中用户头像
-    private CircleImageView userHeade;
+    private CircleImageView userHead;
     private TextView userNickName;
 
     private Button leftMenuBtn;
+
+    /**
+     * 用于刷新头像的
+     * @param event
+     */
+    @Subscribe
+    public void onEventBackgroundThread(UpdataEvent event) {
+        if (event.getType() == UpdataEvent.UPDATE_USER_INFOS) {
+            setUserHead();
+            userNickName.setText(AccountUtils.getUserNickName(HomeActivity.this));
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +75,9 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
     }
 
     private void initDatas() {
+        //注册EventBus
+        EventBus.getDefault().register(this);
+
         mTextViews = new ArrayList<>();
         notesFragment = new NotesFragment();
         diariesFragment = new DiariesFragment();
@@ -78,8 +100,8 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         mTextViews.add((TextView) findViewById(R.id.left_menu_setting));
         mTextViews.add((TextView) findViewById(R.id.left_menu_about_us));
 
-        userHeade = (CircleImageView) findViewById(R.id.iv_left_menu_user_head);
-        userHeade.setImage(R.drawable.user_head_defaut);
+        userHead = (CircleImageView) findViewById(R.id.iv_left_menu_user_head);
+        setUserHead();
 
         userNickName = (TextView) findViewById(R.id.tv_left_menu_user_name);
         if (!TextUtils.isEmpty(user_nickname)) {
@@ -176,5 +198,28 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    /**
+     * 设置用户头像
+     */
+    private void setUserHead() {
+        String photoUrl = AccountUtils.getUserHeadUrl(HomeActivity.this);
+        if (!TextUtils.isEmpty(photoUrl) && !photoUrl.equals("")) {
+            ImageLoader.getmInstance(HomeActivity.this, getCacheDir().getAbsolutePath())
+                    .downLoadBitmap(photoUrl, new ImageLoader.onLoadBitmapListener() {
+                        @Override
+                        public void onLoad(Bitmap bitmap) {
+                            userHead.setImage(bitmap);
+                        }
+                    });
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //注销EventBus
+        EventBus.getDefault().unregister(this);
     }
 }

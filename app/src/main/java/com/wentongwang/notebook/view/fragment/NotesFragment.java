@@ -63,6 +63,8 @@ public class NotesFragment extends Fragment {
     private TextView nodata;
     //进度条
     private View progressBar;
+    //用于第一次进来获取数据，之后恢复时都不需要获取
+    private boolean update;
     /**
      * 用于刷新listview的
      *
@@ -80,6 +82,7 @@ public class NotesFragment extends Fragment {
     public void onAttach(Context context) {
         //注册EventBus
         EventBus.getDefault().register(this);
+        update = true;
         super.onAttach(context);
 
     }
@@ -102,7 +105,10 @@ public class NotesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        getNotes();
+        if (update) {
+            getNotes();
+        }
+
     }
 
     private void initData() {
@@ -110,7 +116,7 @@ public class NotesFragment extends Fragment {
     }
 
     /**
-     * 从数据库中提取notes
+     * 从服务器中提取notes
      */
     private void getNotes() {
         progressBar.setVisibility(View.VISIBLE);
@@ -141,12 +147,14 @@ public class NotesFragment extends Fragment {
                     nodata.setVisibility(View.VISIBLE);
                 }
                 progressBar.setVisibility(View.GONE);
+                update = false;
             }
 
             @Override
             public void onError(int code, String msg) {
                 nodata.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
+                update = true;
                 Toast.makeText(getActivity(), "操作失败: " + msg, Toast.LENGTH_LONG).show();
             }
         });

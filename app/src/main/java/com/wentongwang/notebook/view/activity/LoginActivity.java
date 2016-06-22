@@ -53,11 +53,11 @@ public class LoginActivity extends BaseActivity implements LoginView,View.OnClic
     protected int getLayoutId() {
         return R.layout.login_activity_layout;
     }
-
+    @Override
     protected void initDatas() {
 //        Bmob.initialize(this, Constants.APPLICATION_ID);
     }
-
+    @Override
     protected void initViews() {
         loginBtn = (Button) findViewById(R.id.btn_sign_in);
         signUpBtn = (Button) findViewById(R.id.btn_sign_up);
@@ -67,7 +67,7 @@ public class LoginActivity extends BaseActivity implements LoginView,View.OnClic
 
         porgessBar = findViewById(R.id.progress_bar);
     }
-
+    @Override
     protected void initEvents() {
         loginBtn.setOnClickListener(this);
         signUpBtn.setOnClickListener(this);

@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import com.wentongwang.notebook.model.User;
 
 /**
+ * 用户信息管理类
  * Created by Wentong WANG on 2016/6/12.
  */
 public class AccountUtils {
@@ -17,6 +18,7 @@ public class AccountUtils {
     private static final String USER_NICK_NAME = "user_nickname";
     private static final String USER_DIARY_PWD = "user_diraypwd";
     private static final String USER_SEX = "user_sex";
+    private static final String USER_HEAD_URL = "user_head_url";
 
     /**
      * 保存用户的所有信息
@@ -32,6 +34,7 @@ public class AccountUtils {
         saveUserEmail(context, user.getEmail());
         saveUserDiaryPwd(context, user.getUser_diraypwd());
         saveUserSex(context, user.getUser_sex());
+        saveUserHead(context, user.getUser_head_url());
     }
 
 
@@ -93,6 +96,12 @@ public class AccountUtils {
         SPUtils.put(context, USER_SEX, str);
     }
 
+    public static String getUserHeadUrl(Context context){
+        return (String) SPUtils.get(context, USER_HEAD_URL, "");
+    }
+    public static void saveUserHead(Context context, String str) {
+        SPUtils.put(context, USER_HEAD_URL, str);
+    }
     public static void clearAllInfos(Context context){
         SPUtils.clear(context);
     }

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import com.wentongwang.notebook.R;
@@ -25,8 +26,11 @@ public class CircleImageView extends View {
     private Context mContext;
     private Paint mPaint;
 
-    private boolean hasNewBitmap = false;
 
+    private static final int DEFAUT = 0;
+    private static final int RESOURCE = 1;
+    private static final int BITMAP = 2;
+    private int mPicFrom = DEFAUT;
     public CircleImageView(Context context) {
         this(context, null);
     }
@@ -74,31 +78,39 @@ public class CircleImageView extends View {
         super.onDraw(canvas);
         mPaint.setAntiAlias(true);
         //显示圆形图片有问题
-
-        if (hasNewBitmap) {
-            bitmap = ImageUtils.resize(bitmap, imageSize, imageSize);
-            canvas.drawBitmap(ImageUtils.creatCircleBitmap(bitmap, imageSize), 0, 0, mPaint);
-            hasNewBitmap = false;
-        } else if (resourceId != -1) {
-            bitmap = ImageUtils.decodeBitmapFromResource(getResources(), resourceId, imageSize, imageSize);
-            bitmap = ImageUtils.resize(bitmap, imageSize, imageSize);
-            canvas.drawBitmap(ImageUtils.creatCircleBitmap(bitmap, imageSize), 0, 0, mPaint);
-        } else {
-            defaut = ImageUtils.decodeBitmapFromResource(getResources(), R.drawable.user_head_defaut, imageSize, imageSize);
-            defaut = ImageUtils.resize(bitmap, imageSize, imageSize);
-            canvas.drawBitmap(ImageUtils.creatCircleBitmap(defaut, imageSize), 0, 0, mPaint);
+        switch (mPicFrom) {
+            case DEFAUT:
+                //最后使用默认
+                Log.i("xxxx", "使用默认");
+                defaut = ImageUtils.decodeBitmapFromResource(getResources(), R.drawable.user_head_defaut, imageSize, imageSize);
+                defaut = ImageUtils.resize(bitmap, imageSize, imageSize);
+                canvas.drawBitmap(ImageUtils.creatCircleBitmap(defaut, imageSize), 0, 0, mPaint);
+                break;
+            case RESOURCE:
+                bitmap = ImageUtils.decodeBitmapFromResource(getResources(), resourceId, imageSize, imageSize);
+                bitmap = ImageUtils.resize(bitmap, imageSize, imageSize);
+                canvas.drawBitmap(ImageUtils.creatCircleBitmap(bitmap, imageSize), 0, 0, mPaint);
+                break;
+            case BITMAP:
+                //如果使用的是bitmap
+                Log.i("xxxx", "使用bitmap");
+                bitmap = ImageUtils.resize(bitmap, imageSize, imageSize);
+                canvas.drawBitmap(ImageUtils.creatCircleBitmap(bitmap, imageSize), 0, 0, mPaint);
+                break;
         }
+
     }
 
     public void setImage(int resourceId) {
         this.resourceId = resourceId;
 //        bitmap = ImageUtils.decodeBitmapFromResource(getResources(),resourceId,imageSize,imageSize);
+        mPicFrom = RESOURCE;
         invalidate();
     }
 
     public void setImage(Bitmap bitmap) {
         this.bitmap = bitmap;
-        hasNewBitmap = true;
+        mPicFrom = BITMAP;
         invalidate();
     }
 }

@@ -6,7 +6,7 @@ package com.wentongwang.notebook.model;
 public class UpdataEvent {
     public static final int UPDATE_NOTES = 0;
     public static final int UPDATE_DIARIES = 1;
-
+    public static final int UPDATE_USER_INFOS = 2;
     private int type;
 
     public void setType(int type) {
