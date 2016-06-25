@@ -4,6 +4,13 @@
     android:layout_height="match_parent"
     android:background="#455A64">
 
+    <ImageView
+        android:id="@+id/iv_user_sex"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/male"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"/>
 
     <com.wentongwang.notebook.view.custome.CircleImageView
         android:id="@+id/iv_left_menu_user_head"

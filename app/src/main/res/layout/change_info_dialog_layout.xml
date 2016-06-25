@@ -2,17 +2,41 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <EditText
-        android:id="@+id/ed_change_info"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="15dp"
+    android:layout_marginRight="15dp"
+    android:layout_marginTop="15dp">
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="您新的昵称"/>
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/iv_change_info_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/diary_pwd"/>
+        <EditText
+            android:id="@+id/ed_change_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="您新的昵称"/>
+    </LinearLayout>
 
-    <EditText
-        android:id="@+id/ed_pwd_confirm"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:hint="您的密码"/>
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/password"/>
+        <EditText
+            android:id="@+id/ed_pwd_confirm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:hint="您的密码"/>
+    </LinearLayout>
+
+
 </LinearLayout>

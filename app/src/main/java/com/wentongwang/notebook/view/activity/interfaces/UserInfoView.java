@@ -2,6 +2,8 @@ package com.wentongwang.notebook.view.activity.interfaces;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.view.LayoutInflater;
 
 /**
  * Created by Wentong WANG on 2016/6/22.
@@ -66,5 +68,18 @@ public interface UserInfoView {
     /**
      * 刷新其他界面的头像
      */
-    void toUpdateUserHead();
+    void toUpdateUserInfo();
+
+    /**
+     * 获取布局加载器
+     * @return
+     */
+    LayoutInflater getLayoutInflater();
+
+    /**
+     * 根据资源id获取drawable
+     * @param id
+     * @return
+     */
+    Drawable getDrawableByResource(int id);
 }

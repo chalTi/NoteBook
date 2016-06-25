@@ -139,15 +139,14 @@
                 android:src="@drawable/to_right" />
         </LinearLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content">
 
             <TextView
-                android:layout_width="0dp"
+                android:id="@+id/tv_sex_title"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5"
                 android:paddingBottom="5dp"
                 android:paddingLeft="10dp"
                 android:paddingTop="5dp"
@@ -155,25 +154,27 @@
                 android:textColor="@android:color/black"
                 android:textSize="20sp" />
 
-            <TextView
-                android:id="@+id/tv_user_sex"
-                android:layout_width="0dp"
+            <ImageView
+                android:layout_toRightOf="@id/tv_sex_title"
+                android:id="@+id/iv_user_sex"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="5"
                 android:paddingBottom="5dp"
                 android:paddingTop="5dp"
-                android:text="性别"
-                android:textSize="20sp" />
+                android:layout_marginLeft="30dp"
+                android:src="@drawable/male"/>
 
             <ImageView
                 android:id="@+id/to_change_user_sex"
-                android:layout_width="0dp"
+                android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:layout_gravity="center"
-                android:layout_weight="0.8"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
                 android:onClick="onClick"
-                android:src="@drawable/to_right" />
-        </LinearLayout>
+                android:src="@drawable/to_right"
+                />
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

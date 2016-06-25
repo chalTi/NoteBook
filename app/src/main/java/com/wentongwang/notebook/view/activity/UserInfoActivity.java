@@ -8,20 +8,24 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
+import com.wentongwang.notebook.business.UserBiz;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.presenters.UserInfoPresenter;
 import com.wentongwang.notebook.utils.ImageLoader;
@@ -55,7 +59,7 @@ public class UserInfoActivity extends Activity implements UserInfoView{
     private TextView tvUserName;
     private TextView tvUserNickName;
     private TextView tvUserEmail;
-    private TextView tvUserSex;
+    private ImageView ivUserSex;
     private TextView tvUserDiaryPwd;
 
     private String userSex;
@@ -91,7 +95,7 @@ public class UserInfoActivity extends Activity implements UserInfoView{
         tvUserName = (TextView) findViewById(R.id.tv_user_name);
         tvUserNickName = (TextView) findViewById(R.id.tv_user_nickname);
         tvUserEmail = (TextView) findViewById(R.id.tv_user_email);
-        tvUserSex = (TextView) findViewById(R.id.tv_user_sex);
+        ivUserSex = (ImageView) findViewById(R.id.iv_user_sex);
         tvUserDiaryPwd = (TextView) findViewById(R.id.tv_user_diarypwd);
 
         mPresenter.setUserInfo();
@@ -109,16 +113,22 @@ public class UserInfoActivity extends Activity implements UserInfoView{
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.to_change_user_nickname:
-                changeUserNickName();
+                //改变用户昵称
+                AlertDialog nickNameDialog = mPresenter.buildeChangeInfoDialog(UserBiz.UPDATE_USER_NICKNAME);
+                nickNameDialog.show();
                 break;
             case R.id.to_change_user_email:
-                changeUserEmail();
+                //改变用户邮箱
+                AlertDialog emailDialog = mPresenter.buildeChangeInfoDialog(UserBiz.UPDATE_USER_EMAIL);
+                emailDialog.show();
                 break;
             case R.id.to_change_user_sex:
                 changeUserSex();
                 break;
             case R.id.to_change_user_diarypwd:
-                changeUserDiaryPwd();
+                //改变用户日记锁密码
+                AlertDialog pwdDialog = mPresenter.buildeChangeInfoDialog(UserBiz.UPDATE_USER_DIARYPWD);
+                pwdDialog.show();
                 break;
             case R.id.iv_back_btn:
                 onBackPressed();
@@ -131,64 +141,6 @@ public class UserInfoActivity extends Activity implements UserInfoView{
                 showPopwindow();
                 break;
         }
-    }
-    /**
-     * 更改用户昵称
-     */
-    public void changeUserNickName() {
-        View layout;
-        final EditText et_pwd;
-        final EditText et_change;
-
-        layout = getLayoutInflater().inflate(R.layout.change_info_dialog_layout, null);
-        et_pwd = (EditText) layout.findViewById(R.id.ed_pwd_confirm);
-        et_change = (EditText) layout.findViewById(R.id.ed_change_info);
-        et_change.setHint("新的昵称");
-        AlertDialog.Builder nicknameBuilder = new AlertDialog.Builder(UserInfoActivity.this)
-                .setTitle("修改昵称")
-                .setView(layout)
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String pwd = et_pwd.getText().toString();
-                        if (pwd.equals(AccountUtils.getUserPwd(UserInfoActivity.this))) {
-                            mPresenter.upDateInfo(UserInfoPresenter.UPDATE_USER_NICKNAME, et_change.getText().toString());
-                        } else {
-                            MyToast.showLong(UserInfoActivity.this, "密码错误");
-                        }
-                    }
-                });
-        nicknameBuilder.create().show();
-    }
-    /**
-     * 改变用户日记锁密码
-     */
-    private void changeUserDiaryPwd() {
-        View layout;
-        final EditText et_pwd;
-        final EditText et_change;
-        //载入,初始化自定义对话框布局
-        layout = getLayoutInflater().inflate(R.layout.change_info_dialog_layout, null);
-        et_pwd = (EditText) layout.findViewById(R.id.ed_pwd_confirm);
-        et_change = (EditText) layout.findViewById(R.id.ed_change_info);
-        et_change.setHint("新的日记密码");
-        //设置对话框
-        AlertDialog.Builder diarypwdBuilder = new AlertDialog.Builder(UserInfoActivity.this)
-                .setTitle("修改日记密码")
-                .setView(layout)
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String pwd = et_pwd.getText().toString();
-                        if (pwd.equals(AccountUtils.getUserPwd(UserInfoActivity.this))) {
-                            mPresenter.upDateInfo(UserInfoPresenter.UPDATE_USER_DIARYPWD, et_change.getText().toString());
-                        } else {
-                            Toast.makeText(UserInfoActivity.this, "密码不正确，重新输入", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-        //弹出对话框
-        diarypwdBuilder.create().show();
     }
 
     /**
@@ -207,40 +159,13 @@ public class UserInfoActivity extends Activity implements UserInfoView{
         sexBuilder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mPresenter.upDateInfo(UserInfoPresenter.UPDATE_USER_SEX, userSex);
+                mPresenter.upDateInfo(UserBiz.UPDATE_USER_SEX, userSex);
             }
         });
         sexBuilder.create().show();
     }
 
-    /**
-     * 改变用户邮箱
-     */
-    private void changeUserEmail() {
-        View layout;
-        final EditText et_pwd;
-        final EditText et_change;
 
-        layout = getLayoutInflater().inflate(R.layout.change_info_dialog_layout, null);
-        et_pwd = (EditText) layout.findViewById(R.id.ed_pwd_confirm);
-        et_change = (EditText) layout.findViewById(R.id.ed_change_info);
-        et_change.setHint("新的邮箱");
-        AlertDialog.Builder emailBuilder = new AlertDialog.Builder(UserInfoActivity.this)
-                .setTitle("修改邮箱")
-                .setView(layout)
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String pwd = et_pwd.getText().toString();
-                        if (pwd.equals(AccountUtils.getUserPwd(UserInfoActivity.this))) {
-                            mPresenter.upDateInfo(UserInfoPresenter.UPDATE_USER_EMAIL, et_change.getText().toString());
-                        } else {
-                            Toast.makeText(UserInfoActivity.this, "密码不正确，重新输入", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-        emailBuilder.create().show();
-    }
 
     /**
      * 显示popupWindow
@@ -382,6 +307,7 @@ public class UserInfoActivity extends Activity implements UserInfoView{
      */
     @Override
     public void setUserNickName(String userNickName) {
+        //TODO:把这些判断逻辑写到presenter里去，让外部不知道底层逻辑是什么
         if (!TextUtils.isEmpty(userNickName) && !userNickName.equals("")) {
             tvUserNickName.setText(userNickName);
         } else {
@@ -411,9 +337,12 @@ public class UserInfoActivity extends Activity implements UserInfoView{
     @Override
     public void setUserSex(String sex) {
         if (!TextUtils.isEmpty(sex) && !sex.equals("")) {
-            tvUserSex.setText(sex);
+            if (sex.equals("女"))
+                ivUserSex.setImageDrawable(getResources().getDrawable(R.drawable.female));
+            else
+                ivUserSex.setImageDrawable(getResources().getDrawable(R.drawable.male));
         } else {
-            tvUserSex.setText("男");
+            ivUserSex.setImageDrawable(getResources().getDrawable(R.drawable.male));
         }
     }
 
@@ -481,10 +410,21 @@ public class UserInfoActivity extends Activity implements UserInfoView{
      * 刷新其他界面的头像
      */
     @Override
-    public void toUpdateUserHead() {
+    public void toUpdateUserInfo() {
         UpdataEvent event = new UpdataEvent();
         event.setType(UpdataEvent.UPDATE_USER_INFOS);
         EventBus.getDefault().post(event);
+    }
+
+    /**
+     * 根据资源id获取drawable
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public Drawable getDrawableByResource(int id) {
+        return getResources().getDrawable(id);
     }
 
 

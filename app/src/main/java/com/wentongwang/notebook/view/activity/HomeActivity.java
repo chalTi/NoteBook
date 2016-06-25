@@ -1,8 +1,10 @@
 package com.wentongwang.notebook.view.activity;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -20,7 +22,9 @@ import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.UpdataEvent;
+import com.wentongwang.notebook.presenters.HomePresenter;
 import com.wentongwang.notebook.utils.ImageLoader;
+import com.wentongwang.notebook.view.activity.interfaces.HomeView;
 import com.wentongwang.notebook.view.custome.CircleImageView;
 import com.wentongwang.notebook.view.fragment.DiariesFragment;
 import com.wentongwang.notebook.view.fragment.NotesFragment;
@@ -33,26 +37,33 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends FragmentActivity implements View.OnClickListener {
-
+/**
+ * 主界面
+ */
+public class HomeActivity extends FragmentActivity implements View.OnClickListener,HomeView {
+    //侧拉菜单界面
     private DrawerLayout drawerLayout;
-
+    //toolbar部分的控件
     private ImageView leftBtn;
     private TextView title;
     private View toolbar;
-
+    //菜单栏里的textViews
     private List<TextView> mTextViews;
-
+    //两个切换的fragments
     private NotesFragment notesFragment;
     private DiariesFragment diariesFragment;
 
-    private String user_nickname;
     //左侧菜单栏中用户头像
     private CircleImageView userHead;
+    //昵称
     private TextView userNickName;
-
+    //性别
+    private ImageView userSex;
+    //个人中心按钮
     private Button leftMenuBtn;
 
+
+    private HomePresenter mPresenter = new HomePresenter(this);
     /**
      * 用于刷新头像的
      * @param event
@@ -60,8 +71,9 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
     @Subscribe
     public void onEventBackgroundThread(UpdataEvent event) {
         if (event.getType() == UpdataEvent.UPDATE_USER_INFOS) {
-            setUserHead();
-            userNickName.setText(AccountUtils.getUserNickName(HomeActivity.this));
+            mPresenter.setUserHead();
+            mPresenter.setUserNickName();
+            mPresenter.setUserSex();
         }
     }
     @Override
@@ -71,7 +83,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         initDatas();
         initViews();
         initEvents();
-        showNotesFragment();
+        mPresenter.showNotesFragment();
     }
 
     private void initDatas() {
@@ -81,8 +93,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         mTextViews = new ArrayList<>();
         notesFragment = new NotesFragment();
         diariesFragment = new DiariesFragment();
-
-        user_nickname = AccountUtils.getUserNickName(this);
 
     }
 
@@ -101,14 +111,12 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         mTextViews.add((TextView) findViewById(R.id.left_menu_about_us));
 
         userHead = (CircleImageView) findViewById(R.id.iv_left_menu_user_head);
-        setUserHead();
-
+        mPresenter.setUserHead();
         userNickName = (TextView) findViewById(R.id.tv_left_menu_user_name);
-        if (!TextUtils.isEmpty(user_nickname)) {
-            userNickName.setText(user_nickname);
-        } else {
-            userNickName.setText(AccountUtils.getUserName(this));
-        }
+        mPresenter.setUserNickName();
+        userSex = (ImageView) findViewById(R.id.iv_user_sex);
+        mPresenter.setUserSex();
+
         leftMenuBtn = (Button) findViewById(R.id.btn_left_menu_userinfo);
 
     }
@@ -136,9 +144,29 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         leftMenuBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent it = new Intent();
-                it.setClass(HomeActivity.this, UserInfoActivity.class);
-                startActivity(it);
+                goToUserInfoActivity();
+            }
+        });
+
+        drawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                drawerView.setClickable(true);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
             }
         });
     }
@@ -148,12 +176,12 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         switch (v.getId()) {
             case R.id.left_menu_note:
                 //显示便签的fragment
-                showNotesFragment();
+                mPresenter.showNotesFragment();
                 drawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.left_menu_diary:
                 //显示日记的fragment
-                showDiariesFragment();
+                mPresenter.showDiariesFragment();
                 drawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.left_menu_setting:
@@ -165,10 +193,16 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         }
     }
 
+    @Override
+    public Context getMyContext() {
+        return HomeActivity.this;
+    }
+
     /**
      * 显示便笺列表界面
      */
-    private void showNotesFragment() {
+    @Override
+    public void showNotesFragment() {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.replace(R.id.home_activity_container, notesFragment);
@@ -178,7 +212,8 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
     /**
      * 显示日记列表界面
      */
-    private void showDiariesFragment() {
+    @Override
+    public void showDiariesFragment() {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.replace(R.id.home_activity_container, diariesFragment);
@@ -203,17 +238,47 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
     /**
      * 设置用户头像
      */
-    private void setUserHead() {
-        String photoUrl = AccountUtils.getUserHeadUrl(HomeActivity.this);
-        if (!TextUtils.isEmpty(photoUrl) && !photoUrl.equals("")) {
-            ImageLoader.getmInstance(HomeActivity.this, getCacheDir().getAbsolutePath())
-                    .downLoadBitmap(photoUrl, new ImageLoader.onLoadBitmapListener() {
-                        @Override
-                        public void onLoad(Bitmap bitmap) {
-                            userHead.setImage(bitmap);
-                        }
-                    });
-        }
+    @Override
+    public void setUserHead(Bitmap bitmap) {
+        userHead.setImage(bitmap);
+    }
+
+    /**
+     * 设置用户昵称
+     */
+    @Override
+    public void setUserNickName(String nickName) {
+        userNickName.setText(nickName);
+    }
+
+    /**
+     * 设置用户性别
+     *
+     * @param sex
+     */
+    @Override
+    public void setUserSex(Drawable sex) {
+        userSex.setImageDrawable(sex);
+    }
+
+    /**
+     * 跳转到用户中心界面
+     */
+    @Override
+    public void goToUserInfoActivity() {
+        Intent it = new Intent();
+        it.setClass(HomeActivity.this, UserInfoActivity.class);
+        startActivity(it);
+    }
+
+    /**
+     * 获取缓存文件夹目录
+     *
+     * @return
+     */
+    @Override
+    public String getCachePath() {
+        return getCacheDir().getAbsolutePath();
     }
 
     @Override

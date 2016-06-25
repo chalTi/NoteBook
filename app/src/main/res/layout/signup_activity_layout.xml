@@ -6,6 +6,7 @@
 
 
     <LinearLayout
+
         android:layout_marginTop="100dp"
         android:id="@+id/ll_sign_up_container"
         android:orientation="vertical"
@@ -19,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text="用户名"
-            android:textColor="#B6B6B6"
+            android:textColor="@android:color/white"
             android:textSize="12dp"/>
         <EditText
             android:id="@+id/et_sign_up_username"
@@ -37,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text="密码"
-            android:textColor="#B6B6B6"
+            android:textColor="@android:color/white"
             android:textSize="12dp"/>
         <EditText
             android:id="@+id/et_sign_up_pwd"
@@ -55,7 +56,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text="再输一次密码"
-            android:textColor="#B6B6B6"
+            android:textColor="@android:color/white"
             android:textSize="12dp"/>
         <EditText
             android:id="@+id/et_sign_up_pwd_confirm"

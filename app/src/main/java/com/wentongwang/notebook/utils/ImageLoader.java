@@ -70,7 +70,6 @@ public class ImageLoader {
         //1.从内部缓存中获取图片
         bitmap = getBitmapFromLruCache(picUrl);
         if (bitmap != null) {
-            Log.e("xxxx", "缓存中获取");
             //如果从缓存中获取到了,通过回调让用户去使用该bitmap
             if (listener != null) {
                 listener.onLoad(bitmap);
@@ -78,7 +77,6 @@ public class ImageLoader {
         } else {
             //2.没有的话，从本地文件中取图片
             File saveFile = new File(mSavePath, "userHead");
-            Log.e("xxxx", "本地文件获取" + saveFile.getAbsolutePath());
             bitmap = BitmapFactory.decodeFile(saveFile.getAbsolutePath());
             //把图片加入到缓存
             if (bitmap != null) {
@@ -89,7 +87,7 @@ public class ImageLoader {
                     listener.onLoad(bitmap);
                 }
             } else {
-                Log.e("xxxx", "请求网络获取");
+                //3.还是没有的话，请求网络获取
                 downloadBitmap(picUrl, new onNetworkListener() {
                     @Override
                     public void onSuccess(String picUrl) {

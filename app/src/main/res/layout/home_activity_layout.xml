@@ -13,7 +13,8 @@
         layout="@layout/home_activity_left_menu"
         android:layout_width="200dp"
         android:layout_height="match_parent"
-        android:layout_gravity="start" />
+        android:layout_gravity="start"
+        android:clickable="true"/>
 
 
 </android.support.v4.widget.DrawerLayout>
