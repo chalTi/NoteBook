@@ -21,19 +21,7 @@ public class HomePresenter {
         this.homeView = homeView;
         this.userBiz = new UserBiz();
     }
-    /**
-     * 显示notes
-     */
-    public void showNotesFragment(){
-        homeView.showNotesFragment();
-    }
 
-    /**
-     * 显示日记
-     */
-    public void showDiariesFragment(){
-        homeView.showDiariesFragment();
-    }
 
     /**
      * 设置用户头像

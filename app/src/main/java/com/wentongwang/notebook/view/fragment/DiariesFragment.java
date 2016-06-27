@@ -26,12 +26,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
+import com.wentongwang.notebook.model.NoteItem;
+import com.wentongwang.notebook.presenters.DiariesFragmentPresenter;
+import com.wentongwang.notebook.utils.MyToast;
 import com.wentongwang.notebook.view.activity.CreateDiaryActivity;
 import com.wentongwang.notebook.view.activity.EditDiaryActivity;
 import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.DiaryItem;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.utils.AccountUtils;
+import com.wentongwang.notebook.view.fragment.interfaces.DiariesView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -41,12 +45,13 @@ import java.util.List;
 
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.listener.DeleteListener;
 import cn.bmob.v3.listener.FindListener;
 
 /**
  * Created by Wentong WANG on 2016/6/3.
  */
-public class DiariesFragment extends Fragment {
+public class DiariesFragment extends Fragment implements DiariesView{
     //显示日记的list
     private ListView listView;
     //日记list的适配器
@@ -65,21 +70,20 @@ public class DiariesFragment extends Fragment {
     private EditText etFilter;
     //进度条
     private View progressBar;
-    //用户的日记密码
-    private String diaryPwd;
-    //用于第一次进来获取数据，之后恢复时都不需要获取
-    private boolean update;
+
+    private DiariesFragmentPresenter mPresenter = new DiariesFragmentPresenter(this);
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         EventBus.getDefault().register(this);
-        update = true;
+        mPresenter.canUpdateNotes(true);
     }
 
     @Subscribe
     public void onEventBackgroundThread(UpdataEvent event) {
         if (event.getType() == UpdataEvent.UPDATE_DIARIES) {
-            getDiaries();
+            mPresenter.canUpdateNotes(true);
+            mPresenter.getDiaries();
             adapter.notifyDataSetChanged();
         }
     }
@@ -103,60 +107,13 @@ public class DiariesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (update) {
-            getDiaries();
-        }
-        diaryPwd = AccountUtils.getUserDiaryPwd(getActivity());
+        mPresenter.getDiaries();
     }
 
     private void initDatas() {
         diaryItems = new ArrayList<>();
     }
-    /**
-     * 获取日记信息
-     */
-    private void getDiaries(){
-        progressBar.setVisibility(View.VISIBLE);
-        Bmob.initialize(getActivity(), Constants.APPLICATION_ID);
 
-        BmobQuery<DiaryItem> query = new BmobQuery<DiaryItem>();
-        //查询该用户有的diaries
-        String user_id = AccountUtils.getUserId(getActivity());
-        query.addWhereEqualTo(DiaryItem.DIARY_USER_ID, user_id);
-        //返回50条数据，如果不加上这条语句，默认返回10条数据
-        query.setLimit(50);
-        //按更新日期降序排列
-        query.order("-updatedAt");
-        //执行查询方法
-        query.findObjects(getActivity(), new FindListener<DiaryItem>() {
-            @Override
-            public void onSuccess(List<DiaryItem> object) {
-                diaryItems.clear();
-                if (object.size() > 0) {
-                    for (DiaryItem item : object) {
-                        //获得信息
-                        diaryItems.add(item);
-                    }
-                    nodata.setVisibility(View.GONE);
-                    adapter.notifyDataSetChanged();
-                } else {
-                    nodata.setVisibility(View.VISIBLE);
-                }
-                progressBar.setVisibility(View.GONE);
-                update = false;
-            }
-
-            @Override
-            public void onError(int code, String msg) {
-                update = true;
-                progressBar.setVisibility(View.GONE);
-                nodata.setVisibility(View.VISIBLE);
-                Toast.makeText(getActivity(), "操作失败: " + msg, Toast.LENGTH_LONG).show();
-            }
-        });
-
-
-    }
     private void initViews(View root) {
         nodata = (TextView) root.findViewById(R.id.tv_no_data);
 
@@ -196,15 +153,16 @@ public class DiariesFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (diaryItems.get(position).isLockedInBoolean()) {
-                    checkDiaryPwd(diaryItems.get(position));
-                } else {
-                    startDiaryActivity(diaryItems.get(position));
-                }
-
+                mPresenter.goToEditDiaryActivity(position);
             }
         });
-
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                showDeleteDialog(position);
+                return true;
+            }
+        });
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -234,46 +192,28 @@ public class DiariesFragment extends Fragment {
     }
 
     /**
-     * 判断是否可以进入加密的日记
+     * 显示是否删除
      */
-    private void checkDiaryPwd(final DiaryItem diaryItem) {
-        View layout;
-        final EditText et_pwd;
-
-        layout = LayoutInflater.from(getActivity()).inflate(R.layout.input_diarypwd_dialog_layout, null);
-        et_pwd = (EditText) layout.findViewById(R.id.et_input_diarypwd);
-
-        AlertDialog.Builder inputPwdBuilder = new AlertDialog.Builder(getActivity())
-                .setTitle("密码确认")
-                .setView(layout)
+    private void showDeleteDialog(final int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                .setTitle("删除")
+                .setIcon(R.drawable.delete)
+                .setMessage("是否要删除这条日记")
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String pwd = et_pwd.getText().toString();
-                        if (pwd.equals(diaryPwd)) {
-                            startDiaryActivity(diaryItem);
-                        } else {
-                            Toast.makeText(getActivity(), "密码不正确，重新输入", Toast.LENGTH_LONG).show();
-                        }
+                        mPresenter.deleteDiaray(position);
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
                     }
                 });
-        inputPwdBuilder.create().show();
+        builder.create().show();
     }
 
-    /**
-     * 跳转到日记详情界面
-     * @param diaryItem
-     */
-    private void startDiaryActivity(DiaryItem diaryItem) {
-        Intent intent = new Intent();
-        intent.setClass(getActivity(), EditDiaryActivity.class);
-
-        Bundle bundle = new Bundle();
-        //传递该条目所对应的日记
-        bundle.putSerializable("my_diary", diaryItem);
-        intent.putExtras(bundle);
-        startActivity(intent);
-    }
 
     /**
      * 隐藏按钮
@@ -316,6 +256,61 @@ public class DiariesFragment extends Fragment {
         EventBus.getDefault().unregister(this);
     }
 
+    /**
+     * 显示进度条
+     */
+    @Override
+    public void showPorgressBar() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * 隐藏进度条
+     */
+    @Override
+    public void hidePorgressBar() {
+        progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showNoDatas() {
+        nodata.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideNoDatas() {
+        nodata.setVisibility(View.GONE);
+    }
+
+    @Override
+    public List<DiaryItem> getDiariesList() {
+        return diaryItems;
+    }
+
+    /**
+     * 更新列表
+     * @param list
+     */
+    @Override
+    public void updataList(List<DiaryItem> list) {
+        diaryItems = list;
+        adapter.notifyDataSetChanged();
+    }
+    /**
+     * 跳转到日记详情界面
+     * @param diaryItem
+     */
+    @Override
+    public void startDiaryActivity(DiaryItem diaryItem) {
+        Intent intent = new Intent();
+        intent.setClass(getActivity(), EditDiaryActivity.class);
+
+        Bundle bundle = new Bundle();
+        //传递该条目所对应的日记
+        bundle.putSerializable("my_diary", diaryItem);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
     private class MyListViewAdapter extends BaseAdapter implements Filterable{
         private List<DiaryItem> mOriginalValues;
 

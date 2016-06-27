@@ -83,7 +83,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         initDatas();
         initViews();
         initEvents();
-        mPresenter.showNotesFragment();
+        showNotesFragment();
     }
 
     private void initDatas() {
@@ -176,12 +176,12 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         switch (v.getId()) {
             case R.id.left_menu_note:
                 //显示便签的fragment
-                mPresenter.showNotesFragment();
+                showNotesFragment();
                 drawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.left_menu_diary:
                 //显示日记的fragment
-                mPresenter.showDiariesFragment();
+                showDiariesFragment();
                 drawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.left_menu_setting:

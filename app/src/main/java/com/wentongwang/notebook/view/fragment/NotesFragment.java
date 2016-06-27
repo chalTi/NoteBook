@@ -1,7 +1,9 @@
 package com.wentongwang.notebook.view.fragment;
 
 import android.animation.ObjectAnimator;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -24,12 +26,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
+import com.wentongwang.notebook.presenters.NotesFragmentPresenter;
+import com.wentongwang.notebook.utils.MyToast;
 import com.wentongwang.notebook.view.activity.CreateNoteActivity;
 import com.wentongwang.notebook.view.activity.EditNoteActivity;
 import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.NoteItem;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.utils.AccountUtils;
+import com.wentongwang.notebook.view.fragment.interfaces.NotesView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -39,6 +44,7 @@ import java.util.List;
 
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.listener.DeleteListener;
 import cn.bmob.v3.listener.FindListener;
 
 
@@ -46,7 +52,7 @@ import cn.bmob.v3.listener.FindListener;
  * 便签页面
  * Created by Wentong WANG on 2016/6/3.
  */
-public class NotesFragment extends Fragment {
+public class NotesFragment extends Fragment implements NotesView{
 
     private ListView listView;
     private MyListViewAdapter adapter;
@@ -63,8 +69,8 @@ public class NotesFragment extends Fragment {
     private TextView nodata;
     //进度条
     private View progressBar;
-    //用于第一次进来获取数据，之后恢复时都不需要获取
-    private boolean update;
+
+    private NotesFragmentPresenter mPresenter = new NotesFragmentPresenter(this);
     /**
      * 用于刷新listview的
      *
@@ -73,7 +79,8 @@ public class NotesFragment extends Fragment {
     @Subscribe
     public void onEventBackgroundThread(UpdataEvent event) {
         if (event.getType() == UpdataEvent.UPDATE_NOTES) {
-            getNotes();
+            mPresenter.canUpdateNotes(true);
+            mPresenter.getNotes();
             adapter.notifyDataSetChanged();
         }
     }
@@ -82,7 +89,7 @@ public class NotesFragment extends Fragment {
     public void onAttach(Context context) {
         //注册EventBus
         EventBus.getDefault().register(this);
-        update = true;
+        mPresenter.canUpdateNotes(true);
         super.onAttach(context);
 
     }
@@ -105,60 +112,11 @@ public class NotesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (update) {
-            getNotes();
-        }
-
+        mPresenter.getNotes();
     }
 
     private void initData() {
         listNotes = new ArrayList<>();
-    }
-
-    /**
-     * 从服务器中提取notes
-     */
-    private void getNotes() {
-        progressBar.setVisibility(View.VISIBLE);
-        Bmob.initialize(getActivity(), Constants.APPLICATION_ID);
-
-        BmobQuery<NoteItem> query = new BmobQuery<NoteItem>();
-        //查询该用户有的notes
-        String user_id = AccountUtils.getUserId(getActivity());
-        Log.i("xxxx", "user_id = " + user_id);
-        query.addWhereEqualTo(NoteItem.NOTE_USER_ID, user_id);
-        //返回50条数据，如果不加上这条语句，默认返回10条数据
-        query.setLimit(50);
-        //按更新日期降序排列
-        query.order("-updatedAt");
-        //执行查询方法
-        query.findObjects(getActivity(), new FindListener<NoteItem>() {
-            @Override
-            public void onSuccess(List<NoteItem> object) {
-                listNotes.clear();
-                if (object.size() > 0) {
-                    for (NoteItem noteItem : object) {
-                        //获得信息
-                        listNotes.add(noteItem);
-                    }
-                    nodata.setVisibility(View.GONE);
-                    adapter.notifyDataSetChanged();
-                } else {
-                    nodata.setVisibility(View.VISIBLE);
-                }
-                progressBar.setVisibility(View.GONE);
-                update = false;
-            }
-
-            @Override
-            public void onError(int code, String msg) {
-                nodata.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.GONE);
-                update = true;
-                Toast.makeText(getActivity(), "操作失败: " + msg, Toast.LENGTH_LONG).show();
-            }
-        });
-
     }
 
     private void initViews(View root) {
@@ -220,11 +178,11 @@ public class NotesFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        listView.setOnLongClickListener(new View.OnLongClickListener() {
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onLongClick(View v) {
-                //TODO:长按删除
-                return false;
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                showDeleteDialog(position);
+                return true;
             }
         });
         etFilter.addTextChangedListener(new TextWatcher() {
@@ -243,6 +201,29 @@ public class NotesFragment extends Fragment {
 
             }
         });
+    }
+
+    /**
+     * 显示是否删除
+     */
+    private void showDeleteDialog(final int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                .setTitle("删除")
+                .setIcon(R.drawable.delete)
+                .setMessage("是否要删除这条便签")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mPresenter.deleteNote(position);
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+        builder.create().show();
     }
 
     /**
@@ -293,6 +274,51 @@ public class NotesFragment extends Fragment {
         super.onDetach();
         //注销EventBus
         EventBus.getDefault().unregister(this);
+    }
+
+    /**
+     * 显示进度条
+     */
+    @Override
+    public void showPorgressBar() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * 隐藏进度条
+     */
+    @Override
+    public void hidePorgressBar() {
+        progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showNoDatas() {
+        nodata.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideNoDatas() {
+        nodata.setVisibility(View.GONE);
+    }
+
+    /**
+     * 获取listnotes
+     * @return
+     */
+    @Override
+    public List<NoteItem> getNotesList() {
+        return listNotes;
+    }
+
+    /**
+     * 更新listview
+     * @param list
+     */
+    @Override
+    public void updataList(List<NoteItem> list) {
+        listNotes = list;
+        adapter.notifyDataSetChanged();
     }
 
     private class MyListViewAdapter extends BaseAdapter implements Filterable {
