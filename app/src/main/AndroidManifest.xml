@@ -32,7 +32,7 @@
         <activity android:name=".view.activity.LoginActivity"/>
         <activity android:name=".view.activity.SignUpActivity"/>
         <activity android:name=".view.activity.HomeActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             />
         <activity android:name=".view.activity.CreateNoteActivity"
             android:windowSoftInputMode="stateVisible|adjustResize"

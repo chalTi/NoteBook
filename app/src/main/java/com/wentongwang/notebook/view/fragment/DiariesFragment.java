@@ -220,10 +220,7 @@ public class DiariesFragment extends Fragment implements DiariesView{
      * @param view
      */
     private void hideBtnAnim(View view) {
-        //获取按键初始化后在界面中的Y坐标
-        int btnY = addBtn.getTop();
-
-        ObjectAnimator animator = ObjectAnimator.ofFloat(view, "y", btnY + 50 + addBtn.getMeasuredHeight());
+        ObjectAnimator animator = ObjectAnimator.ofFloat(view, "translationY", 50 + addBtn.getMeasuredHeight());
         animator.setDuration(500);
         animator.start();
 
@@ -236,9 +233,8 @@ public class DiariesFragment extends Fragment implements DiariesView{
      * @param view
      */
     private void showBtnAnim(View view){
-        int btnY = addBtn.getTop();
 
-        ObjectAnimator animator = ObjectAnimator.ofFloat(view, "y", btnY);
+        ObjectAnimator animator = ObjectAnimator.ofFloat(view, "translationY", 0);
         animator.setDuration(1000);
         animator.setInterpolator(new BounceInterpolator());
         animator.start();

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -61,6 +62,7 @@ public class NotesFragment extends Fragment implements NotesView{
     private int lastItemPosition;
     //添加按钮
     private Button addBtn;
+    private int btnY;
     //搜索框
     private EditText etFilter;
     //判断是否显示右下角的按钮
@@ -136,6 +138,20 @@ public class NotesFragment extends Fragment implements NotesView{
 
 
     private void initEvents() {
+        //获取按钮的位置
+        addBtn.post(new Runnable() {
+
+            @Override
+
+            public void run() {
+                int[] position = new int[2];
+                addBtn.getLocationInWindow(position);
+                btnY = position[1];
+                System.out.println("getLocationInWindow:" + position[0] + "," + position[1]);
+            }
+
+        });
+
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -232,10 +248,7 @@ public class NotesFragment extends Fragment implements NotesView{
      * @param view
      */
     private void hideBtnAnim(View view) {
-        //获取按键初始化后在界面中的Y坐标
-        int btnY = addBtn.getTop();
-
-        ObjectAnimator animator = ObjectAnimator.ofFloat(view, "y", btnY + 50 + addBtn.getMeasuredHeight());
+        ObjectAnimator animator = ObjectAnimator.ofFloat(view, "translationY", 50 + addBtn.getMeasuredHeight());
         animator.setDuration(500);
         animator.start();
 
@@ -249,9 +262,7 @@ public class NotesFragment extends Fragment implements NotesView{
      * @param view
      */
     private void showBtnAnim(View view) {
-        int btnY = addBtn.getTop();
-
-        ObjectAnimator animator = ObjectAnimator.ofFloat(view, "y", btnY);
+        ObjectAnimator animator = ObjectAnimator.ofFloat(view, "translationY", 0);
         animator.setDuration(1000);
         animator.setInterpolator(new BounceInterpolator());
         animator.start();

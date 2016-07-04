@@ -26,6 +26,7 @@ import com.wentongwang.notebook.presenters.HomePresenter;
 import com.wentongwang.notebook.utils.ImageLoader;
 import com.wentongwang.notebook.view.activity.interfaces.HomeView;
 import com.wentongwang.notebook.view.custome.CircleImageView;
+import com.wentongwang.notebook.view.fragment.AboutUsFragment;
 import com.wentongwang.notebook.view.fragment.DiariesFragment;
 import com.wentongwang.notebook.view.fragment.NotesFragment;
 import com.wentongwang.notebook.utils.AccountUtils;
@@ -185,10 +186,11 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
                 drawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.left_menu_setting:
-
+                drawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.left_menu_about_us:
-
+                showAboutUsFragment();
+                drawerLayout.closeDrawer(GravityCompat.START);
                 break;
         }
     }
@@ -219,6 +221,17 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         transaction.replace(R.id.home_activity_container, diariesFragment);
         transaction.commit();
     }
+
+    /**
+     * 显示日记列表界面
+     */
+    public void showAboutUsFragment() {
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(R.id.home_activity_container, new AboutUsFragment());
+        transaction.commit();
+    }
+
 
     private long mExitTime = 0;
     @Override
