@@ -1,6 +1,7 @@
 package com.wentongwang.notebook.view.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -14,8 +15,10 @@ import android.widget.Toast;
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.DiaryItem;
 import com.wentongwang.notebook.model.UpdataEvent;
+import com.wentongwang.notebook.presenters.CreatDiaryPresenter;
 import com.wentongwang.notebook.utils.AccountUtils;
 import com.wentongwang.notebook.utils.MyActivityManager;
+import com.wentongwang.notebook.view.activity.interfaces.CreatDiaryView;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -28,7 +31,7 @@ import cn.bmob.v3.listener.SaveListener;
  * 创建新的日记
  * Created by Wentong WANG on 2016/6/6.
  */
-public class CreateDiaryActivity  extends BaseActivity {
+public class CreateDiaryActivity  extends BaseActivity implements CreatDiaryView{
     //顶部toolbar部分
     private View toolbar;
     private TextView title;
@@ -46,6 +49,8 @@ public class CreateDiaryActivity  extends BaseActivity {
     //上锁和不上锁的两个图片
     private Bitmap nolock;
     private Bitmap lock;
+
+    private CreatDiaryPresenter mPresenter = new CreatDiaryPresenter(this);
     /**
      * 获取布局
      *
@@ -98,64 +103,104 @@ public class CreateDiaryActivity  extends BaseActivity {
         leftBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                MyActivityManager.getInstance().pop();
                 onBackPressed();
             }
         });
         rightBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isLocked) {
-                    isLocked = false;
-                    rightBtn.setImageBitmap(nolock);
-                    Toast.makeText(CreateDiaryActivity.this, "日记已解锁", Toast.LENGTH_SHORT).show();
-                } else {
-                    isLocked = true;
-                    rightBtn.setImageBitmap(lock);
-                    Toast.makeText(CreateDiaryActivity.this, "日记已上锁", Toast.LENGTH_SHORT).show();
-                }
+                mPresenter.lockDiary();
             }
         });
         confirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressBar.setVisibility(View.VISIBLE);
-                String diary_content;
-                diary_content = contentText.getText().toString();
-                String diary_title;
-                diary_title = titleText.getText().toString();
-
-                DiaryItem diaryItem = new DiaryItem();
-                //获取当前时间
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd " + "hh:mm:ss");
-                diaryItem.setDiary_date(sdf.format(new Date()));
-                diaryItem.setDiary_title(diary_title);
-                diaryItem.setDiary_content(diary_content);
-                diaryItem.setIsLocked(isLocked);
-                diaryItem.setDiary_user_id(AccountUtils.getUserId(CreateDiaryActivity.this));
-                diaryItem.save(CreateDiaryActivity.this, new SaveListener() {
-                    @Override
-                    public void onSuccess() {
-                        progressBar.setVisibility(View.GONE);
-                        UpdataEvent event = new UpdataEvent();
-                        event.setType(UpdataEvent.UPDATE_DIARIES);
-                        EventBus.getDefault().post(event);
-                        MyActivityManager.getInstance().pop();
-                        onBackPressed();
-                    }
-
-                    @Override
-                    public void onFailure(int code, String msg) {
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(CreateDiaryActivity.this, "操作失败: " + msg, Toast.LENGTH_LONG).show();
-                    }
-                });
-
-
-
+                mPresenter.creatDiary();
             }
         });
     }
 
+
+    /**
+     * 获取当前界面的Context
+     *
+     * @return context
+     */
+    @Override
+    public Context getMyContext() {
+        return CreateDiaryActivity.this;
+    }
+
+    /**
+     * 获取日记内容
+     *
+     * @return
+     */
+    @Override
+    public String getDiaryContent() {
+        return contentText.getText().toString();
+    }
+
+    /**
+     * 获取日记标题
+     *
+     * @return
+     */
+    @Override
+    public String getDiaryTitle() {
+        return titleText.getText().toString();
+    }
+
+    /**
+     * 返回
+     */
+    @Override
+    public void goBack() {
+        UpdataEvent event = new UpdataEvent();
+        event.setType(UpdataEvent.UPDATE_DIARIES);
+        EventBus.getDefault().post(event);
+        MyActivityManager.getInstance().pop();
+        onBackPressed();
+    }
+
+    /**
+     * 显示进度条
+     */
+    @Override
+    public void showPorgressBar() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * 隐藏进度条
+     */
+    @Override
+    public void hidePorgressBar() {
+        progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    @Override
+    public void setLock(boolean is) {
+        this.isLocked = is;
+    }
+
+    /**
+     * 更换锁的图片
+     */
+    @Override
+    public void updateBtnImg() {
+        if (isLocked) {
+            rightBtn.setImageBitmap(lock);
+        } else {
+            rightBtn.setImageBitmap(nolock);
+        }
+    }
 
 
 }
