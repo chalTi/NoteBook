@@ -2,6 +2,9 @@ package com.wentongwang.notebook.view.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+
+import com.wentongwang.notebook.utils.MyActivityManager;
 
 
 /**
@@ -13,6 +16,7 @@ public abstract class BaseActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MyActivityManager.getInstance().addActivity(this);
         this.setContentView(getLayoutId());
         this.initDatas();
         this.initViews();

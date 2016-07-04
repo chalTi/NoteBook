@@ -29,6 +29,7 @@ import com.wentongwang.notebook.business.UserBiz;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.presenters.UserInfoPresenter;
 import com.wentongwang.notebook.utils.ImageLoader;
+import com.wentongwang.notebook.utils.MyActivityManager;
 import com.wentongwang.notebook.utils.MyToast;
 import com.wentongwang.notebook.view.activity.interfaces.UserInfoView;
 import com.wentongwang.notebook.view.custome.CircleImageView;
@@ -50,7 +51,7 @@ import cn.bmob.v3.listener.UpdateListener;
  * 个人信息界面
  * Created by Wentong WANG on 2016/6/7.
  */
-public class UserInfoActivity extends Activity implements UserInfoView{
+public class UserInfoActivity extends BaseActivity implements UserInfoView{
 
     private View rootview;
 
@@ -72,22 +73,29 @@ public class UserInfoActivity extends Activity implements UserInfoView{
 
     private UserInfoPresenter mPresenter = new UserInfoPresenter(this);
 
-
+    /**
+     * 获取布局
+     *
+     * @return 布局界面的Id
+     */
+    @Override
+    protected int getLayoutId() {
+        return R.layout.userinfo_activity_layout;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.userinfo_activity_layout);
         initDatas();
         initViews();
         initEvents();
     }
-
-    private void initDatas() {
+    @Override
+    protected void initDatas() {
 
     }
-
-    private void initViews() {
+    @Override
+    protected void initViews() {
         progressBar = findViewById(R.id.progress_bar);
 
         rootview = findViewById(R.id.userinfo_root_view);
@@ -100,10 +108,12 @@ public class UserInfoActivity extends Activity implements UserInfoView{
 
         mPresenter.setUserInfo();
     }
-
-    private void initEvents() {
+    @Override
+    protected void initEvents() {
 
     }
+
+
 
     /**
      * 点击事件,用于xml里绑定
@@ -131,6 +141,7 @@ public class UserInfoActivity extends Activity implements UserInfoView{
                 pwdDialog.show();
                 break;
             case R.id.iv_back_btn:
+                MyActivityManager.getInstance().pop();
                 onBackPressed();
                 break;
             case R.id.unregistre_btn:
@@ -378,6 +389,7 @@ public class UserInfoActivity extends Activity implements UserInfoView{
         Intent it = new Intent();
         it.setClass(UserInfoActivity.this, LoginActivity.class);
         startActivity(it);
+        MyActivityManager.getInstance().pop();
     }
 
     /**

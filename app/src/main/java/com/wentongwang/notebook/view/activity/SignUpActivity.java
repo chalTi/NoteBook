@@ -108,7 +108,7 @@ public class SignUpActivity extends Activity implements SignUpView{
     @Override
     public void goToLoginActivity() {
         Intent it = new Intent();
-        it.setClass(SignUpActivity.this, HomeActivity.class);
+        it.setClass(SignUpActivity.this, LoginActivity.class);
         startActivity(it);
     }
 }

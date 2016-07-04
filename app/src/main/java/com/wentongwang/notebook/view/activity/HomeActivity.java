@@ -1,6 +1,7 @@
 package com.wentongwang.notebook.view.activity;
 
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -24,6 +25,7 @@ import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.presenters.HomePresenter;
 import com.wentongwang.notebook.utils.ImageLoader;
+import com.wentongwang.notebook.utils.MyActivityManager;
 import com.wentongwang.notebook.view.activity.interfaces.HomeView;
 import com.wentongwang.notebook.view.custome.CircleImageView;
 import com.wentongwang.notebook.view.fragment.AboutUsFragment;
@@ -41,7 +43,7 @@ import java.util.List;
 /**
  * 主界面
  */
-public class HomeActivity extends FragmentActivity implements View.OnClickListener,HomeView {
+public class HomeActivity extends BaseActivity implements View.OnClickListener,HomeView {
     //侧拉菜单界面
     private DrawerLayout drawerLayout;
     //toolbar部分的控件
@@ -77,19 +79,32 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
             mPresenter.setUserSex();
         }
     }
+    /**
+     * 获取布局
+     *
+     * @return 布局界面的Id
+     */
+    @Override
+    protected int getLayoutId() {
+        return R.layout.home_activity_layout;
+    }
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.home_activity_layout);
+        //注册EventBus
+        EventBus.getDefault().register(this);
+
         initDatas();
         initViews();
         initEvents();
         showNotesFragment();
     }
 
-    private void initDatas() {
-        //注册EventBus
-        EventBus.getDefault().register(this);
+    @Override
+    protected void initDatas() {
 
         mTextViews = new ArrayList<>();
         notesFragment = new NotesFragment();
@@ -97,7 +112,8 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
 
     }
 
-    private void initViews() {
+    @Override
+    protected void initViews() {
         toolbar = findViewById(R.id.top_toolbar);
         leftBtn = (ImageView) toolbar.findViewById(R.id.left_btn);
         title = (TextView) toolbar.findViewById(R.id.title);
@@ -122,8 +138,8 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
 
     }
 
-
-    private void initEvents() {
+    @Override
+    protected void initEvents() {
         leftBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -171,6 +187,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
             }
         });
     }
+
 
     @Override
     public void onClick(View v) {
@@ -241,7 +258,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
                 Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
                 mExitTime = System.currentTimeMillis();
             } else {
-                finish();
+                MyActivityManager.getInstance().onTerminate();
             }
             return true;
         }

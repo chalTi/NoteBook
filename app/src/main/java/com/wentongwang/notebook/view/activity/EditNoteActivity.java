@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.NoteItem;
 import com.wentongwang.notebook.model.UpdataEvent;
+import com.wentongwang.notebook.utils.MyActivityManager;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -28,7 +29,7 @@ import cn.bmob.v3.listener.UpdateListener;
  * 观看，修改note的界面
  * Created by Wentong WANG on 2016/6/6.
  */
-public class EditNoteActivity extends Activity implements View.OnClickListener{
+public class EditNoteActivity extends BaseActivity implements View.OnClickListener{
     private View toolbar;
     private TextView title;
     private ImageView leftBtn;
@@ -42,22 +43,31 @@ public class EditNoteActivity extends Activity implements View.OnClickListener{
     private boolean onEdit = false;
     //进度条
     private View progressBar;
+    /**
+     * 获取布局
+     *
+     * @return 布局界面的Id
+     */
+    @Override
+    protected int getLayoutId() {
+        return R.layout.edit_note_activity_layout;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.edit_note_activity_layout);
 
         initDatas();
         initViews();
         initEvents();
     }
-
-    private void initDatas() {
+    @Override
+    protected void initDatas() {
         Bundle bundle = getIntent().getExtras();
         thisNote = (NoteItem) bundle.getSerializable("my_note");
     }
-
-    private void initViews() {
+    @Override
+    protected void initViews() {
         toolbar = findViewById(R.id.top_toolbar);
         title = (TextView) toolbar.findViewById(R.id.title);
         title.setText(thisNote.getNote_date());
@@ -73,18 +83,20 @@ public class EditNoteActivity extends Activity implements View.OnClickListener{
 
         progressBar = findViewById(R.id.progress_bar);
     }
-
-    private void initEvents() {
+    @Override
+    protected void initEvents() {
 
         leftBtn.setOnClickListener(this);
         editBtn.setOnClickListener(this);
     }
 
 
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.left_btn:
+                MyActivityManager.getInstance().pop();
                 onBackPressed();
                 break;
             case R.id.right_btn:
@@ -130,6 +142,7 @@ public class EditNoteActivity extends Activity implements View.OnClickListener{
                 UpdataEvent event = new UpdataEvent();
                 event.setType(UpdataEvent.UPDATE_NOTES);
                 EventBus.getDefault().post(event);
+                MyActivityManager.getInstance().pop();
                 onBackPressed();
             }
 

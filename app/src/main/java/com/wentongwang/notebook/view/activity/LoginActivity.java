@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -17,6 +18,7 @@ import com.wentongwang.notebook.model.User;
 import com.wentongwang.notebook.presenters.LoginPresenter;
 import com.wentongwang.notebook.utils.AccountUtils;
 import com.wentongwang.notebook.utils.MD5Util;
+import com.wentongwang.notebook.utils.MyActivityManager;
 import com.wentongwang.notebook.view.activity.interfaces.LoginView;
 
 import cn.bmob.v3.BmobUser;
@@ -84,6 +86,14 @@ public class LoginActivity extends BaseActivity implements LoginView,View.OnClic
                 goToSignUpActivity();
                 break;
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            MyActivityManager.getInstance().onTerminate();
+        }
+        return true;
     }
 
     @Override

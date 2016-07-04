@@ -15,6 +15,7 @@ import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.NoteItem;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.utils.AccountUtils;
+import com.wentongwang.notebook.utils.MyActivityManager;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -27,7 +28,7 @@ import cn.bmob.v3.listener.SaveListener;
  * 创建新的便签
  * Created by Wentong WANG on 2016/6/3.
  */
-public class CreateNoteActivity extends Activity {
+public class CreateNoteActivity extends BaseActivity {
 
     private View toolbar;
     private TextView title;
@@ -38,17 +39,34 @@ public class CreateNoteActivity extends Activity {
 
     //进度条
     private View progressBar;
+    /**
+     * 获取布局
+     *
+     * @return 布局界面的Id
+     */
+    @Override
+    protected int getLayoutId() {
+        return R.layout.create_note_activity_layout;
+    }
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.create_note_activity_layout);
-
 //        Bmob.initialize(this, Constants.APPLICATION_ID);
         initViews();
         initEvents();
     }
 
-    private void initViews() {
+    /**
+     * 初始化数据
+     */
+    @Override
+    protected void initDatas() {
+
+    }
+    @Override
+    protected void initViews() {
         toolbar = findViewById(R.id.top_toolbar);
         title = (TextView) toolbar.findViewById(R.id.title);
         title.setText("创建新的便签");
@@ -63,8 +81,8 @@ public class CreateNoteActivity extends Activity {
         progressBar = findViewById(R.id.progress_bar);
     }
 
-
-    private void initEvents() {
+    @Override
+    protected void initEvents() {
         leftBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,6 +110,7 @@ public class CreateNoteActivity extends Activity {
                         UpdataEvent event = new UpdataEvent();
                         event.setType(UpdataEvent.UPDATE_NOTES);
                         EventBus.getDefault().post(event);
+                        MyActivityManager.getInstance().pop();
                         onBackPressed();
                     }
                     @Override
@@ -104,5 +123,7 @@ public class CreateNoteActivity extends Activity {
             }
         });
     }
+
+
 
 }
