@@ -1,6 +1,5 @@
 package com.wentongwang.notebook.view.activity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,37 +14,24 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
-import com.wentongwang.notebook.business.UserBiz;
+import com.wentongwang.notebook.model.business.UserBiz;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.presenters.UserInfoPresenter;
-import com.wentongwang.notebook.utils.ImageLoader;
 import com.wentongwang.notebook.utils.MyActivityManager;
-import com.wentongwang.notebook.utils.MyToast;
 import com.wentongwang.notebook.view.activity.interfaces.UserInfoView;
 import com.wentongwang.notebook.view.custome.CircleImageView;
-import com.wentongwang.notebook.model.User;
-import com.wentongwang.notebook.utils.AccountUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import cn.bmob.v3.datatype.BmobFile;
-import cn.bmob.v3.listener.DeleteListener;
-import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * 个人信息界面

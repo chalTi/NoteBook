@@ -1,17 +1,14 @@
-package com.wentongwang.notebook.business;
+package com.wentongwang.notebook.model.business;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
-import android.widget.Toast;
 
 import com.wentongwang.notebook.model.User;
 import com.wentongwang.notebook.utils.AccountUtils;
 import com.wentongwang.notebook.utils.ImageLoader;
 import com.wentongwang.notebook.utils.MD5Util;
 import com.wentongwang.notebook.utils.MyToast;
-import com.wentongwang.notebook.view.activity.HomeActivity;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -333,23 +330,6 @@ public class UserBiz {
                         }
                     });
         }
-    }
-
-    /**
-     * 服务器回复的回调接口
-     */
-    public interface OnResponseListener {
-        /**
-         * 成功
-         * @param response 回复的结果
-         */
-        void onSuccess(Object response);
-
-        /**
-         * 失败
-         * @param msg 失败描述
-         */
-        void onFailure(String msg);
     }
 
 }

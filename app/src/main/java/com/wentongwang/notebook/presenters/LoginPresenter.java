@@ -1,9 +1,8 @@
 package com.wentongwang.notebook.presenters;
 
 
-import android.graphics.Bitmap;
-
-import com.wentongwang.notebook.business.UserBiz;
+import com.wentongwang.notebook.model.business.OnResponseListener;
+import com.wentongwang.notebook.model.business.UserBiz;
 import com.wentongwang.notebook.utils.MyToast;
 import com.wentongwang.notebook.view.activity.interfaces.LoginView;
 
@@ -26,7 +25,7 @@ public class LoginPresenter {
      */
     public void login() {
         loginView.showPorgressBar();
-        userBiz.login(loginView.getMyContext(), loginView.getUserName(), loginView.getUserPwd(), new UserBiz.OnResponseListener() {
+        userBiz.login(loginView.getMyContext(), loginView.getUserName(), loginView.getUserPwd(), new OnResponseListener() {
             @Override
             public void onSuccess(Object response) {
                 loginView.hidePorgressBar();

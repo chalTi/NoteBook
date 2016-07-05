@@ -11,7 +11,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
-import com.wentongwang.notebook.business.UserBiz;
+import com.wentongwang.notebook.model.business.OnResponseListener;
+import com.wentongwang.notebook.model.business.UserBiz;
 import com.wentongwang.notebook.utils.AccountUtils;
 import com.wentongwang.notebook.utils.MyToast;
 import com.wentongwang.notebook.view.activity.interfaces.UserInfoView;
@@ -55,7 +56,7 @@ public class UserInfoPresenter {
     public void upDateInfo(final int id, final String data) {
         userInfoView.showProgressBar();
         //更新用户在服务器上的表单
-        userBiz.updateInfos(userInfoView.getMyContext(), id, data, new UserBiz.OnResponseListener() {
+        userBiz.updateInfos(userInfoView.getMyContext(), id, data, new OnResponseListener() {
             @Override
             public void onSuccess(Object response) {
                 //刷新Ui界面
@@ -106,7 +107,7 @@ public class UserInfoPresenter {
      * 用户的注销
      */
     public void logout() {
-        AccountUtils.clearAllInfos(userInfoView.getMyContext());
+        userBiz.logout(userInfoView.getMyContext());
         userInfoView.goToLoginActivity();
     }
 
@@ -118,7 +119,7 @@ public class UserInfoPresenter {
      */
     public void uploadUserHead(File pic, Bitmap photo) {
         userInfoView.showProgressBar();
-        userBiz.updateUserHead(userInfoView.getMyContext(), userInfoView.getCachePath(), pic, photo, new UserBiz.OnResponseListener() {
+        userBiz.updateUserHead(userInfoView.getMyContext(), userInfoView.getCachePath(), pic, photo, new OnResponseListener() {
 
 
             @Override
@@ -143,7 +144,7 @@ public class UserInfoPresenter {
      */
     public void setUserHead(String savePath) {
         userInfoView.showProgressBar();
-        userBiz.getUserHeadFromServer(userInfoView.getMyContext(), savePath, new UserBiz.OnResponseListener() {
+        userBiz.getUserHeadFromServer(userInfoView.getMyContext(), savePath, new OnResponseListener() {
 
             @Override
             public void onSuccess(Object response) {
