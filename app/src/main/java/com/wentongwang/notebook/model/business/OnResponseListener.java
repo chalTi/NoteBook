@@ -1,5 +1,7 @@
 package com.wentongwang.notebook.model.business;
 
+import com.wentongwang.notebook.model.Response;
+
 /**
  *
  * 服务器回复的回调接口
@@ -11,11 +13,6 @@ public interface OnResponseListener {
      * 成功
      * @param response 回复的结果
      */
-    void onSuccess(Object response);
+    void onResponse(Response response);
 
-    /**
-     * 失败
-     * @param msg 失败描述
-     */
-    void onFailure(String msg);
 }

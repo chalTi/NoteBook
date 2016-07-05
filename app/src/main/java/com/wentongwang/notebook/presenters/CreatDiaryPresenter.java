@@ -3,6 +3,7 @@ package com.wentongwang.notebook.presenters;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.wentongwang.notebook.model.Response;
 import com.wentongwang.notebook.model.business.DiaryBiz;
 import com.wentongwang.notebook.model.business.OnResponseListener;
 import com.wentongwang.notebook.utils.AccountUtils;
@@ -10,7 +11,6 @@ import com.wentongwang.notebook.view.activity.interfaces.CreatDiaryView;
 
 
 /**
- *
  * Created by Wentong WANG on 2016/7/4.
  */
 public class CreatDiaryPresenter {
@@ -42,16 +42,18 @@ public class CreatDiaryPresenter {
         }
         diaryBiz.creatDiary(creatDiaryView.getMyContext(), diary_content, diary_title, creatDiaryView.isLocked(), userId,
                 new OnResponseListener() {
+                    /**
+                     * 成功
+                     * @param response 回复的结果
+                     */
                     @Override
-                    public void onSuccess(Object response) {
+                    public void onResponse(Response response) {
                         creatDiaryView.hidePorgressBar();
-                        creatDiaryView.goBack();
-                    }
-
-                    @Override
-                    public void onFailure(String msg) {
-                        creatDiaryView.hidePorgressBar();
-                        Toast.makeText(creatDiaryView.getMyContext(), "操作失败: " + msg, Toast.LENGTH_LONG).show();
+                        if (response.isSucces()) {
+                            creatDiaryView.goBack();
+                        } else {
+                            Toast.makeText(creatDiaryView.getMyContext(), "操作失败: " + response.getMsg(), Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
     }
@@ -59,7 +61,7 @@ public class CreatDiaryPresenter {
     /**
      * 日记上锁操作
      */
-    public void lockDiary(){
+    public void lockDiary() {
         if (creatDiaryView.isLocked()) {
             creatDiaryView.setLock(false);
             creatDiaryView.updateBtnImg();

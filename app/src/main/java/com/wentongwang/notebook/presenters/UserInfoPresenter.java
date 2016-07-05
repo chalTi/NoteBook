@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
+import com.wentongwang.notebook.model.Response;
 import com.wentongwang.notebook.model.business.OnResponseListener;
 import com.wentongwang.notebook.model.business.UserBiz;
 import com.wentongwang.notebook.utils.AccountUtils;
@@ -58,18 +59,16 @@ public class UserInfoPresenter {
         //更新用户在服务器上的表单
         userBiz.updateInfos(userInfoView.getMyContext(), id, data, new OnResponseListener() {
             @Override
-            public void onSuccess(Object response) {
-                //刷新Ui界面
-                notifyChanges(id);
+            public void onResponse(Response response) {
                 userInfoView.hideProgressBar();
-                userInfoView.toUpdateUserInfo();
+                if (response.isSucces()) {
+                    notifyChanges(id);
+                    userInfoView.toUpdateUserInfo();
+                } else {
+                    MyToast.showLong(userInfoView.getMyContext(), "更新失败：" + response.getMsg());
+                }
             }
 
-            @Override
-            public void onFailure(String msg) {
-                userInfoView.hideProgressBar();
-                MyToast.showLong(userInfoView.getMyContext(), "更新失败：" + msg);
-            }
         });
     }
 
@@ -120,18 +119,14 @@ public class UserInfoPresenter {
     public void uploadUserHead(File pic, Bitmap photo) {
         userInfoView.showProgressBar();
         userBiz.updateUserHead(userInfoView.getMyContext(), userInfoView.getCachePath(), pic, photo, new OnResponseListener() {
-
-
             @Override
-            public void onSuccess(Object response) {
+            public void onResponse(Response response) {
                 userInfoView.hideProgressBar();
-                setUserHead(userInfoView.getCachePath());
-            }
-
-            @Override
-            public void onFailure(String msg) {
-                userInfoView.hideProgressBar();
-                MyToast.showLong(userInfoView.getMyContext(), "修改头像失败" + msg);
+                if (response.isSucces()) {
+                    setUserHead(userInfoView.getCachePath());
+                } else {
+                    MyToast.showLong(userInfoView.getMyContext(), "修改头像失败" + response.getMsg());
+                }
             }
         });
     }
@@ -145,21 +140,16 @@ public class UserInfoPresenter {
     public void setUserHead(String savePath) {
         userInfoView.showProgressBar();
         userBiz.getUserHeadFromServer(userInfoView.getMyContext(), savePath, new OnResponseListener() {
-
             @Override
-            public void onSuccess(Object response) {
-                if (response instanceof Bitmap) {
-                    Bitmap bitmap = (Bitmap) response;
+            public void onResponse(Response response) {
+                userInfoView.hideProgressBar();
+                if (response.isSucces()) {
+                    Bitmap bitmap = response.getBitmap();
                     userInfoView.setUserHead(bitmap);
                     userInfoView.toUpdateUserInfo();
+                } else {
+                    MyToast.showLong(userInfoView.getMyContext(), "获取头像失败" + response.getMsg());
                 }
-                userInfoView.hideProgressBar();
-            }
-
-            @Override
-            public void onFailure(String msg) {
-                userInfoView.hideProgressBar();
-                MyToast.showLong(userInfoView.getMyContext(), "获取头像失败" + msg);
             }
         });
     }

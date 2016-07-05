@@ -6,11 +6,16 @@ import android.widget.Toast;
 
 import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.NoteItem;
+import com.wentongwang.notebook.model.Response;
+import com.wentongwang.notebook.model.business.NoteBiz;
+import com.wentongwang.notebook.model.business.OnResponseListener;
+import com.wentongwang.notebook.model.business.UserBiz;
 import com.wentongwang.notebook.utils.AccountUtils;
 import com.wentongwang.notebook.utils.MyToast;
 import com.wentongwang.notebook.view.fragment.interfaces.NotesView;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import cn.bmob.v3.Bmob;
@@ -25,49 +30,44 @@ public class NotesFragmentPresenter {
 
     private NotesView notesView;
     private boolean update = true;
-
+    private NoteBiz noteBiz;
+    private UserBiz userBiz;
     public NotesFragmentPresenter(NotesView notesView) {
         this.notesView = notesView;
+        noteBiz = new NoteBiz();
+        userBiz = new UserBiz();
     }
 
+    /**
+     * 获取用户所有的便签
+     */
     public void getNotes() {
         if (update) {
             notesView.showPorgressBar();
-            Bmob.initialize(notesView.getActivity(), Constants.APPLICATION_ID);
 
-            BmobQuery<NoteItem> query = new BmobQuery<NoteItem>();
             //查询该用户有的notes
             String user_id = AccountUtils.getUserId(notesView.getActivity());
-            query.addWhereEqualTo(NoteItem.NOTE_USER_ID, user_id);
-            //返回50条数据，如果不加上这条语句，默认返回10条数据
-            query.setLimit(50);
-            //按更新日期降序排列
-            query.order("-updatedAt");
-            //执行查询方法
-            query.findObjects(notesView.getActivity(), new FindListener<NoteItem>() {
-                @Override
-                public void onSuccess(List<NoteItem> object) {
-                    notesView.hidePorgressBar();
-                    List<NoteItem> list = new ArrayList<NoteItem>();
-                    if (object.size() > 0) {
-                        for (NoteItem noteItem : object) {
-                            //获得信息
-                            list.add(noteItem);
-                        }
-                        notesView.hideNoDatas();
-                        notesView.updataList(list);
-                    } else {
-                        notesView.showNoDatas();
-                    }
-                    update = false;
-                }
+
+            userBiz.getUserNotes(notesView.getActivity(), user_id, new OnResponseListener() {
 
                 @Override
-                public void onError(int code, String msg) {
-                    notesView.showNoDatas();
+                public void onResponse(Response response) {
                     notesView.hidePorgressBar();
-                    update = true;
-                    Toast.makeText(notesView.getActivity(), "操作失败: " + msg, Toast.LENGTH_LONG).show();
+                    if (response.isSucces()) {
+                        List<NoteItem> list = new ArrayList<NoteItem>();
+                        list.addAll(response.getNoteItemList());
+                        if (list.size() > 0) {
+                            notesView.hideNoDatas();
+                            notesView.updataList(list);
+                        } else {
+                            notesView.showNoDatas();
+                        }
+                        update = false;
+                    } else {
+                        notesView.showNoDatas();
+                        update = true;
+                        MyToast.showLong(notesView.getActivity(), "操作失败: " + response.getMsg());
+                    }
                 }
             });
         }
@@ -88,19 +88,20 @@ public class NotesFragmentPresenter {
     public void deleteNote(final int position) {
         final List<NoteItem> list = notesView.getNotesList();
         String id = list.get(position).getObjectId();
-        NoteItem item = new NoteItem();
-        item.setObjectId(id);
-        item.delete(notesView.getActivity(), new DeleteListener() {
+        notesView.showPorgressBar();
+        noteBiz.deleteNote(notesView.getActivity(), id, new OnResponseListener() {
             @Override
-            public void onSuccess() {
-                MyToast.showLong(notesView.getActivity(), "删除成功");
-                list.remove(position);
-                notesView.updataList(list);
-            }
+            public void onResponse(Response response) {
+                notesView.hidePorgressBar();
+                if (response.isSucces()) {
 
-            @Override
-            public void onFailure(int code, String msg) {
-                MyToast.showLong(notesView.getActivity(), "删除失败" + msg);
+                    MyToast.showShort(notesView.getActivity(), "删除成功");
+                    list.remove(position);
+                    notesView.updataList(list);
+                } else {
+
+                    MyToast.showLong(notesView.getActivity(), "删除失败" + response.getMsg());
+                }
             }
         });
     }

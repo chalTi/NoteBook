@@ -1,5 +1,6 @@
 package com.wentongwang.notebook.presenters;
 
+import com.wentongwang.notebook.model.Response;
 import com.wentongwang.notebook.model.business.OnResponseListener;
 import com.wentongwang.notebook.model.business.UserBiz;
 import com.wentongwang.notebook.utils.MyToast;
@@ -25,14 +26,13 @@ public class SignUpPresenter {
         if (signUpView.getUserPwd().equals(signUpView.getUserPwdConfirm())) {
             userBiz.registre(signUpView.getMyContext(), signUpView.getUserName(), signUpView.getUserPwd(), new OnResponseListener() {
                 @Override
-                public void onSuccess(Object response) {
-                    MyToast.showLong(signUpView.getMyContext(),"注册成功");
-                    signUpView.goToLoginActivity();
-                }
-
-                @Override
-                public void onFailure(String msg) {
-                    MyToast.showLong(signUpView.getMyContext(),"注册失败" + msg);
+                public void onResponse(Response response) {
+                    if (response.isSucces()) {
+                        MyToast.showShort(signUpView.getMyContext(), "注册成功");
+                        signUpView.goToLoginActivity();
+                    } else {
+                        MyToast.showLong(signUpView.getMyContext(),"注册失败" + response.getMsg());
+                    }
                 }
             });
         }

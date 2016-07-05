@@ -4,12 +4,12 @@ import android.text.TextUtils;
 
 import android.widget.Toast;
 
+import com.wentongwang.notebook.model.Response;
 import com.wentongwang.notebook.model.business.NoteBiz;
 import com.wentongwang.notebook.model.business.OnResponseListener;
 import com.wentongwang.notebook.utils.AccountUtils;
 
 import com.wentongwang.notebook.view.activity.interfaces.CreatNoteView;
-
 
 
 /**
@@ -25,8 +25,8 @@ public class CreatNotePresenter {
         noteBiz = new NoteBiz();
     }
 
-    public void creatNote(){
-        String note_content= creatNoteView.getNoteContent();
+    public void creatNote() {
+        String note_content = creatNoteView.getNoteContent();
         String userId = AccountUtils.getUserId(creatNoteView.getMyContext());
         if (TextUtils.isEmpty(userId)) {
             Toast.makeText(creatNoteView.getMyContext(), "登录异常，请重新登录", Toast.LENGTH_LONG).show();
@@ -38,16 +38,19 @@ public class CreatNotePresenter {
         }
 
         noteBiz.creatNote(creatNoteView.getMyContext(), note_content, userId, new OnResponseListener() {
+            /**
+             * 成功
+             *
+             * @param response 回复的结果
+             */
             @Override
-            public void onSuccess(Object response) {
+            public void onResponse(Response response) {
                 creatNoteView.hidePorgressBar();
-                creatNoteView.goBack();
-            }
-
-            @Override
-            public void onFailure(String msg) {
-                creatNoteView.hidePorgressBar();
-                Toast.makeText(creatNoteView.getMyContext(), "操作失败: " + msg, Toast.LENGTH_LONG).show();
+                if (response.isSucces()) {
+                    creatNoteView.goBack();
+                } else {
+                    Toast.makeText(creatNoteView.getMyContext(), "操作失败: " + response.getMsg(), Toast.LENGTH_LONG).show();
+                }
             }
         });
 

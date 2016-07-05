@@ -3,7 +3,11 @@ package com.wentongwang.notebook.model.business;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
+import android.widget.Toast;
 
+import com.wentongwang.notebook.model.Constants;
+import com.wentongwang.notebook.model.NoteItem;
+import com.wentongwang.notebook.model.Response;
 import com.wentongwang.notebook.model.User;
 import com.wentongwang.notebook.utils.AccountUtils;
 import com.wentongwang.notebook.utils.ImageLoader;
@@ -14,10 +18,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.listener.DeleteListener;
+import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 
@@ -101,14 +110,19 @@ public class UserBiz {
                 saveUserInfos(context, id, data);
                 //回调成功接口
                 if (listener != null) {
-                    listener.onSuccess(null);
+                    Response response = new Response();
+                    response.setIsSucces(true);
+                    listener.onResponse(response);
                 }
             }
 
             @Override
             public void onFailure(int code, String msg) {
                 if (listener != null) {
-                    listener.onFailure(msg);
+                    Response response = new Response();
+                    response.setIsSucces(false);
+                    response.setMsg(msg);
+                    listener.onResponse(response);
                 }
             }
         });
@@ -165,14 +179,19 @@ public class UserBiz {
                 AccountUtils.saveUserInfos(context, user, pwd);
                 //回调成功接口
                 if (listener != null) {
-                    listener.onSuccess(null);
+                    Response response = new Response();
+                    response.setIsSucces(true);
+                    listener.onResponse(response);
                 }
             }
 
             @Override
             public void onFailure(int code, String msg) {
                 if (listener != null) {
-                    listener.onFailure(msg);
+                    Response response = new Response();
+                    response.setIsSucces(false);
+                    response.setMsg(msg);
+                    listener.onResponse(response);
                 }
             }
         });
@@ -206,14 +225,19 @@ public class UserBiz {
                     AccountUtils.saveUserInfos(context, user, userPwd);
 
                     if (listener != null) {
-                        listener.onSuccess(null);
+                        Response response = new Response();
+                        response.setIsSucces(true);
+                        listener.onResponse(response);
                     }
                 }
 
                 @Override
                 public void onFailure(int code, String msg) {
                     if (listener != null) {
-                        listener.onFailure(msg);
+                        Response response = new Response();
+                        response.setIsSucces(false);
+                        response.setMsg(msg);
+                        listener.onResponse(response);
                     }
                 }
             });
@@ -250,7 +274,10 @@ public class UserBiz {
                         @Override
                         public void onFailure(String msg) {
                             if (listener != null) {
-                                listener.onFailure(msg);
+                                Response response = new Response();
+                                response.setIsSucces(false);
+                                response.setMsg(msg);
+                                listener.onResponse(response);
                             }
                         }
                     });
@@ -279,14 +306,19 @@ public class UserBiz {
             @Override
             public void onSuccess() {
                 if (listener != null) {
-                    listener.onSuccess(null);
+                    Response response = new Response();
+                    response.setIsSucces(true);
+                    listener.onResponse(response);
                 }
             }
 
             @Override
             public void onFailure(int code, String msg) {
                 if (listener != null) {
-                    listener.onFailure(msg);
+                    Response response = new Response();
+                    response.setIsSucces(false);
+                    response.setMsg(msg);
+                    listener.onResponse(response);
                 }
             }
         });
@@ -324,12 +356,55 @@ public class UserBiz {
                         @Override
                         public void onLoad(Bitmap bitmap) {
                             if (listener != null) {
-                                listener.onSuccess(bitmap);
+                                Response response = new Response();
+                                response.setIsSucces(true);
+                                response.setBitmap(bitmap);
+                                listener.onResponse(response);
                             }
 
                         }
                     });
         }
     }
+
+    /**
+     * 获取用户所有的便签
+     * @param context
+     * @param user_id
+     * @param listener
+     */
+    public void getUserNotes(Context context, String user_id, final OnResponseListener listener){
+        Bmob.initialize(context, Constants.APPLICATION_ID);
+        BmobQuery<NoteItem> query = new BmobQuery<NoteItem>();
+
+        query.addWhereEqualTo(NoteItem.NOTE_USER_ID, user_id);
+        //返回50条数据，如果不加上这条语句，默认返回10条数据
+        query.setLimit(50);
+        //按更新日期降序排列
+        query.order("-updatedAt");
+        //执行查询方法
+        query.findObjects(context, new FindListener<NoteItem>() {
+            @Override
+            public void onSuccess(List<NoteItem> object) {
+                if (listener != null) {
+                    Response response = new Response();
+                    response.setIsSucces(true);
+                    response.setNoteItemList(object);
+                    listener.onResponse(response);
+                }
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                if (listener != null) {
+                    Response response = new Response();
+                    response.setIsSucces(false);
+                    response.setMsg(msg);
+                    listener.onResponse(response);
+                }
+            }
+        });
+    }
+
 
 }

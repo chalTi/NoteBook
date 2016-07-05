@@ -2,8 +2,10 @@ package com.wentongwang.notebook.presenters;
 
 import android.graphics.Bitmap;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
+import com.wentongwang.notebook.model.Response;
 import com.wentongwang.notebook.model.business.OnResponseListener;
 import com.wentongwang.notebook.model.business.UserBiz;
 import com.wentongwang.notebook.utils.AccountUtils;
@@ -30,17 +32,13 @@ public class HomePresenter {
     public void setUserHead() {
         userBiz.getUserHeadFromServer(homeView.getMyContext(), homeView.getCachePath(), new OnResponseListener() {
             @Override
-            public void onSuccess(Object response) {
-                if (response instanceof Bitmap) {
-                    Bitmap bitmap = (Bitmap) response;
+            public void onResponse(Response response) {
+                if (response.isSucces()) {
+                    Bitmap bitmap = response.getBitmap();
                     homeView.setUserHead(bitmap);
+                } else {
+                    MyToast.showLong(homeView.getMyContext(), "设置头像失败:" + response.getMsg());
                 }
-
-            }
-
-            @Override
-            public void onFailure(String msg) {
-                MyToast.showLong(homeView.getMyContext(), "设置头像失败:" + msg);
             }
         });
     }

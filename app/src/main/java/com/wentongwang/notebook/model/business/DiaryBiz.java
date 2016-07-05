@@ -3,6 +3,7 @@ package com.wentongwang.notebook.model.business;
 import android.content.Context;
 
 import com.wentongwang.notebook.model.DiaryItem;
+import com.wentongwang.notebook.model.Response;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,14 +42,19 @@ public class DiaryBiz {
             @Override
             public void onSuccess() {
                 if (listener != null) {
-                    listener.onSuccess(null);
+                    Response response = new Response();
+                    response.setIsSucces(true);
+                    listener.onResponse(response);
                 }
             }
 
             @Override
             public void onFailure(int code, String msg) {
                 if (listener != null) {
-                    listener.onFailure(msg);
+                    Response response = new Response();
+                    response.setIsSucces(false);
+                    response.setMsg(msg);
+                    listener.onResponse(response);
                 }
             }
         });

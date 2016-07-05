@@ -1,6 +1,6 @@
 package com.wentongwang.notebook.view.activity;
 
-import android.app.Activity;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,25 +11,22 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.NoteItem;
 import com.wentongwang.notebook.model.UpdataEvent;
+import com.wentongwang.notebook.presenters.EditNotePresenter;
 import com.wentongwang.notebook.utils.MyActivityManager;
+import com.wentongwang.notebook.view.activity.interfaces.EditNoteView;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * 观看，修改note的界面
  * Created by Wentong WANG on 2016/6/6.
  */
-public class EditNoteActivity extends BaseActivity implements View.OnClickListener{
+public class EditNoteActivity extends BaseActivity implements View.OnClickListener,EditNoteView{
     private View toolbar;
     private TextView title;
     private ImageView leftBtn;
@@ -43,6 +40,8 @@ public class EditNoteActivity extends BaseActivity implements View.OnClickListen
     private boolean onEdit = false;
     //进度条
     private View progressBar;
+
+    private EditNotePresenter mPresenter = new EditNotePresenter(this);
     /**
      * 获取布局
      *
@@ -76,8 +75,8 @@ public class EditNoteActivity extends BaseActivity implements View.OnClickListen
         leftBtn.setImageBitmap(bitmap);
 
         text = (EditText) findViewById(R.id.note_content);
-        text.setText(thisNote.getNote_content());
-        text.setEnabled(false);
+        //初始化
+        mPresenter.setNoteContent();
 
         editBtn = (Button) findViewById(R.id.edit_btn);
 
@@ -96,64 +95,131 @@ public class EditNoteActivity extends BaseActivity implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.left_btn:
-                MyActivityManager.getInstance().pop();
-                onBackPressed();
+                    goBack();
                 break;
             case R.id.right_btn:
 
                 break;
             case R.id.edit_btn:
-                if (!onEdit) {
-                    //EditText可编辑状态
-                    text.setEnabled(true);
-                    text.setSelection(text.getText().toString().length());
-                    //弹出软键盘的操作
-                    InputMethodManager inputMethodManager=(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-
-                    editBtn.setBackground(getResources().getDrawable(R.drawable.confirm_btn));
-                    onEdit = true;
-                } else {
-                    text.setEnabled(false);
-                    editBtn.setBackground(getResources().getDrawable(R.drawable.edit_btn));
-                    onEdit = false;
-                    submitText();
-
-
-                }
+                mPresenter.edit();
                 break;
         }
     }
 
-    private void submitText(){
+
+
+    /**
+     * 获取当前界面的Context
+     *
+     * @return context
+     */
+    @Override
+    public Context getMyContext() {
+        return EditNoteActivity.this;
+    }
+
+    /**
+     * 获取便签
+     *
+     * @return
+     */
+    @Override
+    public NoteItem getNoteFromIntent() {
+        Bundle bundle = getIntent().getExtras();
+        return (NoteItem) bundle.getSerializable("my_note");
+    }
+
+    /**
+     * 设置便签内容
+     *
+     * @return
+     */
+    @Override
+    public void setNoteContent(String content) {
+        text.setText(content);
+        text.setEnabled(false);
+    }
+
+    /**
+     * 获取日记内容
+     *
+     * @return
+     */
+    @Override
+    public String getNoteContent() {
+        return text.getText().toString();
+    }
+
+    /**
+     * 返回
+     */
+    @Override
+    public void goBack() {
+        MyActivityManager.getInstance().pop();
+        onBackPressed();
+    }
+
+    /**
+     * 修改完成跳转
+     */
+    @Override
+    public void finishAndBack() {
+        UpdataEvent event = new UpdataEvent();
+        event.setType(UpdataEvent.UPDATE_NOTES);
+        EventBus.getDefault().post(event);
+        MyActivityManager.getInstance().pop();
+        onBackPressed();
+    }
+
+    /**
+     * 显示进度条
+     */
+    @Override
+    public void showPorgressBar() {
         progressBar.setVisibility(View.VISIBLE);
-        String note_content;
-        note_content = text.getText().toString();
+    }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd " + "hh:mm:ss");
-        thisNote.setNote_date(sdf.format(new Date()));
-        thisNote.setNote_content(note_content);
+    /**
+     * 隐藏进度条
+     */
+    @Override
+    public void hidePorgressBar() {
+        progressBar.setVisibility(View.GONE);
+    }
 
-        thisNote.update(this, thisNote.getObjectId(), new UpdateListener() {
-            @Override
-            public void onSuccess() {
-                //通知界面更新
-                progressBar.setVisibility(View.GONE);
-                UpdataEvent event = new UpdataEvent();
-                event.setType(UpdataEvent.UPDATE_NOTES);
-                EventBus.getDefault().post(event);
-                MyActivityManager.getInstance().pop();
-                onBackPressed();
-            }
+    /**
+     * 开启编辑
+     */
+    @Override
+    public void beginEdit() {
+        //EditText可编辑状态
+        text.setEnabled(true);
+        text.setSelection(text.getText().toString().length());
+        //弹出软键盘的操作
+        InputMethodManager inputMethodManager=(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
 
-            @Override
-            public void onFailure(int code, String msg) {
-                progressBar.setVisibility(View.GONE);
-                Toast.makeText(EditNoteActivity.this, "操作失败: " + msg, Toast.LENGTH_LONG).show();
-            }
-        });
+        editBtn.setBackground(getResources().getDrawable(R.drawable.confirm_btn));
+        onEdit = true;
+    }
 
+    /**
+     * 完成编辑
+     */
+    @Override
+    public void finishEdit() {
+        text.setEnabled(false);
+        editBtn.setBackground(getResources().getDrawable(R.drawable.edit_btn));
+        onEdit = false;
+    }
 
-
+    /**
+     * 判断是否是可编辑状态
+     *
+     * @return
+     */
+    @Override
+    public boolean canEdit() {
+        return onEdit;
     }
 }

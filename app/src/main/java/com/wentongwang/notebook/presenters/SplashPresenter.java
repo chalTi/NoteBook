@@ -4,7 +4,10 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.wentongwang.notebook.model.Response;
 import com.wentongwang.notebook.model.User;
+import com.wentongwang.notebook.model.business.OnResponseListener;
+import com.wentongwang.notebook.model.business.UserBiz;
 import com.wentongwang.notebook.utils.AccountUtils;
 import com.wentongwang.notebook.utils.MD5Util;
 import com.wentongwang.notebook.utils.MyToast;
@@ -21,11 +24,14 @@ import cn.bmob.v3.listener.SaveListener;
 public class SplashPresenter {
 
     private SplashView splashView;
+    private UserBiz userBiz;
+
     private String user_name;
     private String user_pwd;
 
     public SplashPresenter(SplashView splashView) {
         this.splashView = splashView;
+        userBiz = new UserBiz();
     }
 
     /**
@@ -47,29 +53,18 @@ public class SplashPresenter {
      * 用户登录
      */
     private void login() {
-        User bu2 = new User();
-        bu2.setUsername(user_name);
-        bu2.setPassword(MD5Util.MD5(user_pwd));
-        bu2.login(splashView.getMyContext(), new SaveListener() {
+
+        userBiz.login(splashView.getMyContext(), user_name, user_pwd, new OnResponseListener() {
             @Override
-            public void onSuccess() {
-                MyToast.showLong(splashView.getMyContext(), "登录成功");
-
-                User user = new User();
-                user = BmobUser.getCurrentUser(splashView.getMyContext(), User.class);
-                Log.i("xxxx", "user_sex " + user.getUser_sex() + "   diaryPwd " + user.getUser_diraypwd());
-                //将用户信息保存本地
-                AccountUtils.saveUserInfos(splashView.getMyContext(), user, user_pwd);
-
-                splashView.goToHomeActivity();
-            }
-
-            @Override
-            public void onFailure(int code, String msg) {
-                MyToast.showLong(splashView.getMyContext(), "登录失败：" + msg);
-                splashView.goToLoginActivity();
+            public void onResponse(Response response) {
+                if (response.isSucces()) {
+                    MyToast.showShort(splashView.getMyContext(), "登录成功");
+                    splashView.goToHomeActivity();
+                } else {
+                    MyToast.showShort(splashView.getMyContext(), "登录失败：" + response.getMsg());
+                    splashView.goToLoginActivity();
+                }
             }
         });
-
     }
 }

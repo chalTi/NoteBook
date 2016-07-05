@@ -1,6 +1,8 @@
 package com.wentongwang.notebook.presenters;
 
 
+
+import com.wentongwang.notebook.model.Response;
 import com.wentongwang.notebook.model.business.OnResponseListener;
 import com.wentongwang.notebook.model.business.UserBiz;
 import com.wentongwang.notebook.utils.MyToast;
@@ -27,15 +29,13 @@ public class LoginPresenter {
         loginView.showPorgressBar();
         userBiz.login(loginView.getMyContext(), loginView.getUserName(), loginView.getUserPwd(), new OnResponseListener() {
             @Override
-            public void onSuccess(Object response) {
+            public void onResponse(Response response) {
                 loginView.hidePorgressBar();
-                loginView.goToHomeActivity();
-            }
-
-            @Override
-            public void onFailure(String msg) {
-                loginView.hidePorgressBar();
-                MyToast.showLong(loginView.getMyContext(), "登录失败：" + msg);
+                if (response.isSucces()) {
+                    loginView.goToHomeActivity();
+                } else {
+                    MyToast.showLong(loginView.getMyContext(), "登录失败：" + response.getMsg());
+                }
             }
         });
     }
