@@ -18,7 +18,8 @@
         android:id="@+id/notes_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/et_filter_string"></ListView>
+        android:layout_below="@id/et_filter_string"
+        android:divider="@null"></ListView>
 
     <Button
         android:id="@+id/add_btn"
