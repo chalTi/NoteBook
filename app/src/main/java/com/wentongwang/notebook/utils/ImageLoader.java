@@ -13,7 +13,7 @@ import cn.bmob.v3.listener.DownloadFileListener;
 import cn.bmob.v3.listener.UploadFileListener;
 
 /**
- * 用于下载图片的三级缓存
+ * 用于下载图片的三级缓存，没有使用线程池。也没用handler去主线程设置图片，而是通过回调直接返回图片
  * Created by Wentong WANG on 2016/6/21.
  */
 public class ImageLoader {
@@ -65,7 +65,7 @@ public class ImageLoader {
      * 获取图片
      * @param picUrl
      */
-    public void downLoadBitmap(String picUrl, final onLoadBitmapListener listener) {
+    public void loadBitmap(String picUrl, final onLoadBitmapListener listener) {
         Bitmap bitmap;
         //1.从内部缓存中获取图片
         bitmap = getBitmapFromLruCache(picUrl);

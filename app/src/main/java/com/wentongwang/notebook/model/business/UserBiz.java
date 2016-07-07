@@ -3,7 +3,6 @@ package com.wentongwang.notebook.model.business;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
-import android.widget.Toast;
 
 import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.NoteItem;
@@ -18,7 +17,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import cn.bmob.v3.Bmob;
@@ -352,7 +350,7 @@ public class UserBiz {
         String photoUrl = AccountUtils.getUserHeadUrl(context);
         if (!TextUtils.isEmpty(photoUrl) && !photoUrl.equals("")) {
             ImageLoader.getmInstance(context, savePath)
-                    .downLoadBitmap(photoUrl, new ImageLoader.onLoadBitmapListener() {
+                    .loadBitmap(photoUrl, new ImageLoader.onLoadBitmapListener() {
                         @Override
                         public void onLoad(Bitmap bitmap) {
                             if (listener != null) {

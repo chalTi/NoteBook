@@ -12,6 +12,8 @@ import android.graphics.PorterDuffXfermode;
 import android.media.ThumbnailUtils;
 import android.os.Build;
 
+import java.io.FileDescriptor;
+
 /**
  * bitmap的工具类
  * Created by Wentong WANG on 2016/5/17.
@@ -84,7 +86,25 @@ public class ImageUtils {
         options.inJustDecodeBounds = false;
         return BitmapFactory.decodeResource(res, resId, options);
     }
-
+    /**
+     * 对图片进行压缩（不改变宽高）, 展示在ImageView中
+     * @param reqWidth  要求的宽度, 单位像素
+     * @param reqHeight 要求的高度, 单位像素
+     * @return 压缩后的bitmap
+     */
+    public static Bitmap decodeBitmapFromFileDescriptor(FileDescriptor fileDescriptor,
+                                                  int reqWidth, int reqHeight) {
+        // 第一次解析将inJustDecodeBounds设置为true,来获取图片大小,不会占据内存
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options);
+        // 调用上面定义的方法计算inSampleSize值
+        options.inSampleSize = calculateInSampleSize(options, reqWidth,
+                reqHeight);
+        // 使用获取到的inSampleSize值再次解析图片
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options);
+    }
     /**
      * 计算压缩比例
      *

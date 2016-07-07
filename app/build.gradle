@@ -34,4 +34,5 @@ dependencies {
     //3.4.7-aar：请务必查看下面注释[1]
     compile 'cn.bmob.android:bmob-sdk:3.4.7-aar'
     compile 'com.android.support:cardview-v7:24.0.0'
+    compile 'com.jakewharton:disklrucache:2.0.2'
 }

@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <EditText
         android:id="@+id/et_filter_string"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="搜索"
         android:drawableLeft="@drawable/search"
-        android:focusableInTouchMode="true"/>
+        android:focusableInTouchMode="true"
+        android:hint="搜索" />
+
     <ListView
-        android:layout_below="@id/et_filter_string"
         android:id="@+id/diaries_listview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </ListView>
+        android:layout_height="match_parent"
+        android:layout_below="@id/et_filter_string"
+        android:divider="@null"></ListView>
 
     <Button
         android:id="@+id/add_btn"
@@ -31,12 +33,12 @@
         android:textSize="26sp" />
 
     <TextView
-        android:visibility="gone"
         android:id="@+id/tv_no_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="你还没开始写你的日记，赶快去添加你的日记吧！"/>
+        android:text="你还没开始写你的日记，赶快去添加你的日记吧！"
+        android:visibility="gone" />
 
     <RelativeLayout
         android:id="@+id/progress_bar"
@@ -47,11 +49,11 @@
         android:clickable="true"
         android:focusable="true"
         android:orientation="vertical"
-        android:visibility="gone" >
+        android:visibility="gone">
 
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"/>
+            android:layout_centerInParent="true" />
     </RelativeLayout>
 </RelativeLayout>
