@@ -2,6 +2,7 @@ package com.wentongwang.notebook.presenters;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -10,6 +11,9 @@ import android.widget.Toast;
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.DiaryItem;
+import com.wentongwang.notebook.model.Response;
+import com.wentongwang.notebook.model.business.DiaryBiz;
+import com.wentongwang.notebook.model.business.OnResponseListener;
 import com.wentongwang.notebook.utils.AccountUtils;
 import com.wentongwang.notebook.utils.MyToast;
 import com.wentongwang.notebook.view.fragment.interfaces.DiariesView;
@@ -28,11 +32,12 @@ import cn.bmob.v3.listener.FindListener;
 public class DiariesFragmentPresenter {
 
     private DiariesView diariesView;
-
+    private DiaryBiz diaryBiz;
     private boolean update = true;
 
     public DiariesFragmentPresenter(DiariesView diariesView) {
         this.diariesView = diariesView;
+        diaryBiz = new DiaryBiz();
     }
 
     /**
@@ -92,19 +97,28 @@ public class DiariesFragmentPresenter {
     public void deleteDiaray(final int position) {
         final List<DiaryItem> list = diariesView.getDiariesList();
         String id = list.get(position).getObjectId();
-        DiaryItem item = new DiaryItem();
-        item.setObjectId(id);
-        item.delete(diariesView.getActivity(), new DeleteListener() {
-            @Override
-            public void onSuccess() {
-                MyToast.showLong(diariesView.getActivity(), "删除成功");
-                list.remove(position);
-                diariesView.updataList(list);
-            }
 
+        if (TextUtils.isEmpty(id)) {
+            MyToast.showLong(diariesView.getActivity(), "客户端数据有误，删除失败，请重新登录");
+            return;
+        }
+        diariesView.showPorgressBar();
+        diaryBiz.deleteDiary(diariesView.getActivity(), id, new OnResponseListener() {
             @Override
-            public void onFailure(int code, String msg) {
-                MyToast.showLong(diariesView.getActivity(), "删除失败" + msg);
+            public void onResponse(Response response) {
+                diariesView.hidePorgressBar();
+                if (response.isSucces()) {
+                    MyToast.showLong(diariesView.getActivity(), "删除成功");
+                    list.remove(position);
+                    if (list.size() == 0) {
+                        diariesView.showNoDatas();
+                    } else {
+                        diariesView.hideNoDatas();
+                    }
+                    diariesView.updataList(list);
+                } else {
+                    MyToast.showLong(diariesView.getActivity(), "删除失败" + response.getMsg());
+                }
             }
         });
     }

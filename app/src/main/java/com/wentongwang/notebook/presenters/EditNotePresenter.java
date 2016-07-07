@@ -56,8 +56,9 @@ public class EditNotePresenter {
 
         if (TextUtils.isEmpty(note_content)) {
             MyToast.showLong(editNoteView.getMyContext(), "你忘写内容啦！");
+            return;
         }
-
+        editNoteView.showPorgressBar();
         noteBiz.editNote(editNoteView.getMyContext(), noteItem, note_content, new OnResponseListener() {
             @Override
             public void onResponse(Response response) {

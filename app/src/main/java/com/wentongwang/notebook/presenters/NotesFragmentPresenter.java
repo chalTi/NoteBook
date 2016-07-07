@@ -1,5 +1,6 @@
 package com.wentongwang.notebook.presenters;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -32,6 +33,7 @@ public class NotesFragmentPresenter {
     private boolean update = true;
     private NoteBiz noteBiz;
     private UserBiz userBiz;
+
     public NotesFragmentPresenter(NotesView notesView) {
         this.notesView = notesView;
         noteBiz = new NoteBiz();
@@ -75,6 +77,7 @@ public class NotesFragmentPresenter {
 
     /**
      * 只有第一次创建这个时候获取信息，以防在fragment暂时放到后台恢复时再次进行多余的请求
+     *
      * @param is
      */
     public void canUpdateNotes(boolean is) {
@@ -83,23 +86,33 @@ public class NotesFragmentPresenter {
 
     /**
      * 删除一条note
+     *
      * @param position
      */
     public void deleteNote(final int position) {
         final List<NoteItem> list = notesView.getNotesList();
         String id = list.get(position).getObjectId();
+
+        if (TextUtils.isEmpty(id)) {
+            MyToast.showLong(notesView.getActivity(), "客户端数据有误，删除失败，请重新登录");
+            return;
+        }
+
         notesView.showPorgressBar();
         noteBiz.deleteNote(notesView.getActivity(), id, new OnResponseListener() {
             @Override
             public void onResponse(Response response) {
                 notesView.hidePorgressBar();
                 if (response.isSucces()) {
-
                     MyToast.showShort(notesView.getActivity(), "删除成功");
                     list.remove(position);
+                    if (list.size() == 0) {
+                        notesView.showNoDatas();
+                    } else {
+                        notesView.hideNoDatas();
+                    }
                     notesView.updataList(list);
                 } else {
-
                     MyToast.showLong(notesView.getActivity(), "删除失败" + response.getMsg());
                 }
             }

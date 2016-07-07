@@ -16,7 +16,9 @@ import android.widget.Toast;
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.DiaryItem;
 import com.wentongwang.notebook.model.UpdataEvent;
+import com.wentongwang.notebook.presenters.EditDiaryPresenter;
 import com.wentongwang.notebook.utils.MyActivityManager;
+import com.wentongwang.notebook.view.activity.interfaces.EditDiaryView;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -29,7 +31,7 @@ import cn.bmob.v3.listener.UpdateListener;
  * 修改日记界面
  * Created by Wentong WANG on 2016/6/8.
  */
-public class EditDiaryActivity extends BaseActivity implements View.OnClickListener{
+public class EditDiaryActivity extends BaseActivity implements View.OnClickListener, EditDiaryView {
     private View toolbar;
     private TextView title;
     private ImageView leftBtn;
@@ -44,6 +46,8 @@ public class EditDiaryActivity extends BaseActivity implements View.OnClickListe
 
     //进度条
     private View progressBar;
+
+    private EditDiaryPresenter mPresenter = new EditDiaryPresenter(this);
 
     /**
      * 获取布局
@@ -63,29 +67,30 @@ public class EditDiaryActivity extends BaseActivity implements View.OnClickListe
         initViews();
         initEvents();
     }
+
     @Override
     protected void initDatas() {
         Bundle bundle = getIntent().getExtras();
         thisDiary = (DiaryItem) bundle.getSerializable("my_diary");
     }
+
     @Override
     protected void initViews() {
 
         toolbar = findViewById(R.id.top_toolbar);
         title = (TextView) toolbar.findViewById(R.id.title);
-        title.setText(thisDiary.getDiary_title());
         leftBtn = (ImageView) toolbar.findViewById(R.id.left_btn);
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.back_btn);
         leftBtn.setImageBitmap(bitmap);
 
         text = (EditText) findViewById(R.id.note_content);
-        text.setText(thisDiary.getDiary_content());
-        text.setEnabled(false);
+        mPresenter.initDiary();
 
         editBtn = (Button) findViewById(R.id.edit_btn);
 
         progressBar = findViewById(R.id.progress_bar);
     }
+
     @Override
     protected void initEvents() {
 
@@ -94,64 +99,141 @@ public class EditDiaryActivity extends BaseActivity implements View.OnClickListe
     }
 
 
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.left_btn:
-                MyActivityManager.getInstance().pop();
-                onBackPressed();
+                goBack();
                 break;
             case R.id.right_btn:
 
                 break;
             case R.id.edit_btn:
-                if (!onEdit) {
-                    text.setEnabled(true);
-                    text.setSelection(text.getText().toString().length());
-                    //弹出软键盘的操作
-                    InputMethodManager inputMethodManager=(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-
-                    editBtn.setBackground(getResources().getDrawable(R.drawable.confirm_btn));
-                    onEdit = true;
-                } else {
-                    text.setEnabled(false);
-                    editBtn.setBackground(getResources().getDrawable(R.drawable.edit_btn));
-                    onEdit = false;
-                    submitText();
-                }
+                mPresenter.edit();
                 break;
         }
     }
 
-    private void submitText(){
+    /**
+     * 获取当前界面的Context
+     *
+     * @return context
+     */
+    @Override
+    public Context getMyContext() {
+        return EditDiaryActivity.this;
+    }
+
+    /**
+     * 获取日记内容
+     *
+     * @return
+     */
+    @Override
+    public String getDiaryContent() {
+        return text.getText().toString();
+    }
+
+    /**
+     * 完成任务后返回
+     */
+    @Override
+    public void finishAndBack() {
+        UpdataEvent event = new UpdataEvent();
+        event.setType(UpdataEvent.UPDATE_DIARIES);
+        EventBus.getDefault().post(event);
+        MyActivityManager.getInstance().pop();
+        onBackPressed();
+    }
+
+    /**
+     * 返回
+     */
+    @Override
+    public void goBack() {
+        MyActivityManager.getInstance().pop();
+        onBackPressed();
+    }
+
+    /**
+     * 显示进度条
+     */
+    @Override
+    public void showPorgressBar() {
         progressBar.setVisibility(View.VISIBLE);
-        String note_content;
-        note_content = text.getText().toString();
+    }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd " + "hh:mm:ss");
-        thisDiary.setDiary_date(sdf.format(new Date()));
-        thisDiary.setDiary_content(note_content);
+    /**
+     * 隐藏进度条
+     */
+    @Override
+    public void hidePorgressBar() {
+        progressBar.setVisibility(View.GONE);
+    }
 
-        thisDiary.update(this, thisDiary.getObjectId(), new UpdateListener() {
-            @Override
-            public void onSuccess() {
-                //通知界面更新
-                progressBar.setVisibility(View.GONE);
-                UpdataEvent event = new UpdataEvent();
-                event.setType(UpdataEvent.UPDATE_DIARIES);
-                EventBus.getDefault().post(event);
-                MyActivityManager.getInstance().pop();
-                onBackPressed();
-            }
+    /**
+     * 从意图中获取日记
+     *
+     * @return
+     */
+    @Override
+    public DiaryItem getDiaryFromIntent() {
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            return (DiaryItem) bundle.getSerializable("my_diary");
+        } else {
+            return null;
+        }
+    }
 
-            @Override
-            public void onFailure(int code, String msg) {
-                progressBar.setVisibility(View.GONE);
-                Toast.makeText(EditDiaryActivity.this, "操作失败: " + msg, Toast.LENGTH_LONG).show();
-            }
-        });
+    /**
+     * 设置日记内容
+     *
+     * @param content
+     * @param t
+     */
+    @Override
+    public void setDiary(String content, String t) {
+        text.setText(content);
+        text.setEnabled(false);
 
+        title.setText(t);
+    }
+
+
+    /**
+     * 开启编辑
+     */
+    @Override
+    public void beginEdit() {
+        //EditText可编辑状态
+        text.setEnabled(true);
+        text.setSelection(text.getText().toString().length());
+        //弹出软键盘的操作
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+
+        editBtn.setBackground(getResources().getDrawable(R.drawable.confirm_btn));
+        onEdit = true;
+    }
+
+    /**
+     * 完成编辑
+     */
+    @Override
+    public void finishEdit() {
+        text.setEnabled(false);
+        editBtn.setBackground(getResources().getDrawable(R.drawable.edit_btn));
+        onEdit = false;
+    }
+
+    /**
+     * 判断是否是可编辑状态
+     *
+     * @return
+     */
+    @Override
+    public boolean canEdit() {
+        return onEdit;
     }
 }

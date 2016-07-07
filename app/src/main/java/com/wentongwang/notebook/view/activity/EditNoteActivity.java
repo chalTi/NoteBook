@@ -95,7 +95,7 @@ public class EditNoteActivity extends BaseActivity implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.left_btn:
-                    goBack();
+                goBack();
                 break;
             case R.id.right_btn:
 
