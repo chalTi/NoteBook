@@ -1,27 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="300dp"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:fitsSystemWindows="true"
-    android:background="#A0607D8B">
+    android:orientation="vertical">
 
-
-    <TextView
+    <ImageView
         android:id="@+id/tv_voice"
-        android:gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textColor="@android:color/white"
-        />
-    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/voice1" />
 
+    <TextView
         android:id="@+id/tv_recoder_state"
-        android:gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:layout_height="50dp"
+        android:layout_marginTop="50dp"
+        android:gravity="center"
         android:text="ssss"
-        android:textColor="@android:color/white"/>
-</LinearLayout>
+        android:textColor="#ecf0f1"
+        android:textSize="20sp" />
+</RelativeLayout>

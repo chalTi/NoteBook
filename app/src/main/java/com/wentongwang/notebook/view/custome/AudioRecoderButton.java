@@ -6,6 +6,7 @@ import android.os.Message;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.wentongwang.notebook.managers.RecorderManager;
 
@@ -82,6 +83,7 @@ public class AudioRecoderButton extends Button {
 
     public AudioRecoderButton(Context context, AttributeSet attrs) {
         super(context, attrs);
+        if (isInEditMode()) { return; }
         init(context);
 
     }
@@ -162,9 +164,10 @@ public class AudioRecoderButton extends Button {
      * @return
      */
     private boolean wantToCancle(int x, int y) {
-        if (x < 0 || x > getWidth()) { // 超过按钮的宽度
-            return true;
-        }
+//        if (x < 0 || x > getWidth()) { // 超过按钮的宽度
+//            return true;
+//        }
+
         // 超过按钮的高度
         if (y < -DISTANCE_Y_CANCEL || y > getHeight() + DISTANCE_Y_CANCEL) {
             return true;
@@ -181,17 +184,17 @@ public class AudioRecoderButton extends Button {
             switch (state) {
                 case STATE_NORMAL:
                     isRecording = false;
-                    setText("点我录音");
+//                    setText("点我录音");
                     break;
                 case STATE_RECORDING:
-                    setText("正在录音");
+//                    setText("正在录音");
                     if (!isRecording) {
                         //开始录音
                         mRecorderManager.recorde();
                     }
                     break;
                 case STATE_WANT_TO_CANCEL:
-                    setText("松开取消录音");
+//                    setText("松开取消录音");
                     break;
             }
         }

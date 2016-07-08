@@ -39,16 +39,16 @@
             android:windowSoftInputMode="stateHidden|adjustPan"
             />
         <activity android:name=".view.activity.CreateNoteActivity"
-            android:windowSoftInputMode="stateVisible|adjustResize"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             />
         <activity android:name=".view.activity.EditNoteActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             />
         <activity android:name=".view.activity.EditDiaryActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize"/>
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
 
         <activity android:name=".view.activity.CreateDiaryActivity"
-            android:windowSoftInputMode="stateVisible|adjustResize"
+            android:windowSoftInputMode="stateVisible|adjustPan"
             />
         <activity android:name=".view.activity.UserInfoActivity"/>
     </application>
