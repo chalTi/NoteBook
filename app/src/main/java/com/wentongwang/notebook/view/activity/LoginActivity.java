@@ -1,28 +1,19 @@
 package com.wentongwang.notebook.view.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
-import com.wentongwang.notebook.model.User;
 import com.wentongwang.notebook.presenters.LoginPresenter;
-import com.wentongwang.notebook.utils.AccountUtils;
-import com.wentongwang.notebook.utils.MD5Util;
-import com.wentongwang.notebook.utils.MyActivityManager;
+import com.wentongwang.notebook.managers.MyActivityManager;
 import com.wentongwang.notebook.view.activity.interfaces.LoginView;
-
-import cn.bmob.v3.BmobUser;
-import cn.bmob.v3.listener.SaveListener;
 
 /**
  * 登陆界面

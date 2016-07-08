@@ -45,4 +45,11 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"/>
     </RelativeLayout>
+
+    <com.wentongwang.notebook.view.custome.AudioRecoderButton
+        android:id="@+id/audio_recoder"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="点我录音"/>
 </RelativeLayout>

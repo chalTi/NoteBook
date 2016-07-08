@@ -1,6 +1,5 @@
 package com.wentongwang.notebook.view.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,21 +10,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.DiaryItem;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.presenters.EditDiaryPresenter;
-import com.wentongwang.notebook.utils.MyActivityManager;
+import com.wentongwang.notebook.managers.MyActivityManager;
 import com.wentongwang.notebook.view.activity.interfaces.EditDiaryView;
 
 import org.greenrobot.eventbus.EventBus;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * 修改日记界面

@@ -18,6 +18,7 @@
 
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
 
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/icon"

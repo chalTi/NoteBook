@@ -1,16 +1,9 @@
 package com.wentongwang.notebook.model.business;
 
 import android.content.Context;
-import android.view.View;
-import android.widget.Toast;
 
 import com.wentongwang.notebook.model.DiaryItem;
-import com.wentongwang.notebook.model.NoteItem;
 import com.wentongwang.notebook.model.Response;
-import com.wentongwang.notebook.model.UpdataEvent;
-import com.wentongwang.notebook.utils.MyActivityManager;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

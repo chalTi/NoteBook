@@ -1,19 +1,15 @@
 package com.wentongwang.notebook.view.activity;
 
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -24,14 +20,12 @@ import android.widget.Toast;
 import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.presenters.HomePresenter;
-import com.wentongwang.notebook.utils.ImageLoader;
-import com.wentongwang.notebook.utils.MyActivityManager;
+import com.wentongwang.notebook.managers.MyActivityManager;
 import com.wentongwang.notebook.view.activity.interfaces.HomeView;
 import com.wentongwang.notebook.view.custome.CircleImageView;
 import com.wentongwang.notebook.view.fragment.AboutUsFragment;
 import com.wentongwang.notebook.view.fragment.DiariesFragment;
 import com.wentongwang.notebook.view.fragment.NotesFragment;
-import com.wentongwang.notebook.utils.AccountUtils;
 
 
 import org.greenrobot.eventbus.EventBus;

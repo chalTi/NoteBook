@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:fitsSystemWindows="true"
+    android:background="#A0607D8B">
+
+
+    <TextView
+        android:id="@+id/tv_voice"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="@android:color/white"
+        />
+    <TextView
+
+        android:id="@+id/tv_recoder_state"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="ssss"
+        android:textColor="@android:color/white"/>
+</LinearLayout>

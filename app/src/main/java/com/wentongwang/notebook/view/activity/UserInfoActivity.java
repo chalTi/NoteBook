@@ -25,7 +25,7 @@ import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.business.UserBiz;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.presenters.UserInfoPresenter;
-import com.wentongwang.notebook.utils.MyActivityManager;
+import com.wentongwang.notebook.managers.MyActivityManager;
 import com.wentongwang.notebook.view.activity.interfaces.UserInfoView;
 import com.wentongwang.notebook.view.custome.CircleImageView;
 

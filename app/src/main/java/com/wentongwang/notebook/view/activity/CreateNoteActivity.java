@@ -14,8 +14,9 @@ import com.wentongwang.notebook.R;
 
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.presenters.CreatNotePresenter;
-import com.wentongwang.notebook.utils.MyActivityManager;
+import com.wentongwang.notebook.managers.MyActivityManager;
 import com.wentongwang.notebook.view.activity.interfaces.CreatNoteView;
+import com.wentongwang.notebook.view.custome.AudioRecoderButton;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -30,6 +31,8 @@ public class CreateNoteActivity extends BaseActivity implements CreatNoteView {
     private TextView title;
     private ImageView leftBtn;
     private Button confirmBtn;
+
+    private AudioRecoderButton audioRecoderButton;
 
     private EditText text;
 
@@ -77,6 +80,8 @@ public class CreateNoteActivity extends BaseActivity implements CreatNoteView {
         text = (EditText) findViewById(R.id.note_content);
 
         progressBar = findViewById(R.id.progress_bar);
+
+        audioRecoderButton = (AudioRecoderButton) findViewById(R.id.audio_recoder);
     }
 
     @Override

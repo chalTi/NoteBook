@@ -1,7 +1,6 @@
-package com.wentongwang.notebook.utils;
+package com.wentongwang.notebook.managers;
 
 import android.app.Activity;
-import android.app.Application;
 
 import java.util.ArrayList;
 import java.util.Iterator;

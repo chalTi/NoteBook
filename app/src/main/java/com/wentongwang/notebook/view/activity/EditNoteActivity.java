@@ -16,7 +16,7 @@ import com.wentongwang.notebook.R;
 import com.wentongwang.notebook.model.NoteItem;
 import com.wentongwang.notebook.model.UpdataEvent;
 import com.wentongwang.notebook.presenters.EditNotePresenter;
-import com.wentongwang.notebook.utils.MyActivityManager;
+import com.wentongwang.notebook.managers.MyActivityManager;
 import com.wentongwang.notebook.view.activity.interfaces.EditNoteView;
 
 import org.greenrobot.eventbus.EventBus;
