@@ -288,6 +288,31 @@ public class UserInfoActivity extends BaseActivity implements UserInfoView{
     }
 
     /**
+     * 显示进度条
+     */
+    @Override
+    public void showPorgressBar() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * 隐藏进度条
+     */
+    @Override
+    public void hidePorgressBar() {
+        progressBar.setVisibility(View.GONE);
+    }
+
+    /**
+     * 返回
+     */
+    @Override
+    public void goBack() {
+        MyActivityManager.getInstance().pop();
+        onBackPressed();
+    }
+
+    /**
      * 设置用户名
      *
      * @param userName
@@ -376,22 +401,6 @@ public class UserInfoActivity extends BaseActivity implements UserInfoView{
         it.setClass(UserInfoActivity.this, LoginActivity.class);
         startActivity(it);
         MyActivityManager.getInstance().pop();
-    }
-
-    /**
-     * 显示进度条
-     */
-    @Override
-    public void showProgressBar() {
-        progressBar.setVisibility(View.VISIBLE);
-    }
-
-    /**
-     * 隐藏进度条
-     */
-    @Override
-    public void hideProgressBar() {
-        progressBar.setVisibility(View.GONE);
     }
 
     /**

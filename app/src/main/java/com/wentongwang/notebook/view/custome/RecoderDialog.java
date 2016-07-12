@@ -14,6 +14,7 @@ import com.wentongwang.notebook.R;
 
 
 /**
+ * 录音时弹出对话框
  * Created by Wentong WANG on 2016/7/8.
  */
 public class RecoderDialog {

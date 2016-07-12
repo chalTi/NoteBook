@@ -3,17 +3,13 @@ package com.wentongwang.notebook.view.activity.interfaces;
 import android.content.Context;
 
 import com.wentongwang.notebook.model.NoteItem;
+import com.wentongwang.notebook.view.BaseView;
 
 /**
  * Created by Wentong WANG on 2016/7/5.
  */
-public interface EditNoteView {
+public interface EditNoteView extends BaseView{
 
-    /**
-     * 获取当前界面的Context
-     * @return context
-     */
-    Context getMyContext();
     /**
      * 获取便签
      * @return
@@ -32,24 +28,9 @@ public interface EditNoteView {
     String getNoteContent();
 
     /**
-     * 返回
-     */
-    void goBack();
-
-    /**
      * 修改完成跳转
      */
     void finishAndBack();
-
-    /**
-     * 显示进度条
-     */
-    void showPorgressBar();
-
-    /**
-     * 隐藏进度条
-     */
-    void hidePorgressBar();
 
     /**
      * 开启编辑

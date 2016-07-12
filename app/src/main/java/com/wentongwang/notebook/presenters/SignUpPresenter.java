@@ -24,9 +24,11 @@ public class SignUpPresenter {
      */
     public void signUp() {
         if (signUpView.getUserPwd().equals(signUpView.getUserPwdConfirm())) {
+            signUpView.showPorgressBar();
             userBiz.registre(signUpView.getMyContext(), signUpView.getUserName(), signUpView.getUserPwd(), new OnResponseListener() {
                 @Override
                 public void onResponse(Response response) {
+                    signUpView.hidePorgressBar();
                     if (response.isSucces()) {
                         MyToast.showShort(signUpView.getMyContext(), "注册成功");
                         signUpView.goToLoginActivity();

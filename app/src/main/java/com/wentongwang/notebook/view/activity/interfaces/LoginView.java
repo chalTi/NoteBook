@@ -2,11 +2,13 @@ package com.wentongwang.notebook.view.activity.interfaces;
 
 import android.content.Context;
 
+import com.wentongwang.notebook.view.BaseView;
+
 /**
  * 登录界面View的功能
  * Created by Wentong WANG on 2016/6/21.
  */
-public interface LoginView {
+public interface LoginView extends BaseView{
 
     /**
      * 获取用户名
@@ -21,12 +23,6 @@ public interface LoginView {
     String getUserPwd();
 
     /**
-     * 获取当前界面的Context
-     * @return context
-     */
-    Context getMyContext();
-
-    /**
      * 跳转到主界面
      */
     void goToHomeActivity();
@@ -36,13 +32,4 @@ public interface LoginView {
      */
     void goToSignUpActivity();
 
-    /**
-     * 显示进度条
-     */
-    void showPorgressBar();
-
-    /**
-     * 隐藏进度条
-     */
-    void hidePorgressBar();
 }

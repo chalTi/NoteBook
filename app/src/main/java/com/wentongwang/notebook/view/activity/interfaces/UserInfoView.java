@@ -5,12 +5,14 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 
+import com.wentongwang.notebook.view.BaseView;
+
 /**
+ *
  * Created by Wentong WANG on 2016/6/22.
  */
-public interface UserInfoView {
+public interface UserInfoView extends BaseView{
 
-    Context getMyContext();
     /**
      * 设置用户名
      * @param userName
@@ -48,16 +50,6 @@ public interface UserInfoView {
      * 跳转到登录界面
      */
     void goToLoginActivity();
-
-    /**
-     * 显示进度条
-     */
-    void showProgressBar();
-
-    /**
-     * 隐藏进度条
-     */
-    void hideProgressBar();
 
     /**
      * 获取缓存文件夹目录

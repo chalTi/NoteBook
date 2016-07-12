@@ -138,4 +138,12 @@ public class LoginActivity extends BaseActivity implements LoginView,View.OnClic
         porgessBar.setVisibility(View.GONE);
     }
 
+    /**
+     * 返回
+     */
+    @Override
+    public void goBack() {
+
+    }
+
 }

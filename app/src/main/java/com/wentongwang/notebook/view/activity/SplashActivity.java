@@ -93,6 +93,30 @@ public class SplashActivity extends BaseActivity implements SplashView{
     }
 
     /**
+     * 显示进度条
+     */
+    @Override
+    public void showPorgressBar() {
+
+    }
+
+    /**
+     * 隐藏进度条
+     */
+    @Override
+    public void hidePorgressBar() {
+
+    }
+
+    /**
+     * 返回
+     */
+    @Override
+    public void goBack() {
+
+    }
+
+    /**
      * 跳转到主界面
      */
     @Override

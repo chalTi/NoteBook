@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.wentongwang.notebook.R;
+import com.wentongwang.notebook.managers.MyActivityManager;
 import com.wentongwang.notebook.model.Constants;
 import com.wentongwang.notebook.model.User;
 import com.wentongwang.notebook.presenters.SignUpPresenter;
@@ -34,6 +35,7 @@ public class SignUpActivity extends Activity implements SignUpView{
     private EditText userPwd2;
     private Button singUpBtn;
 
+    private View progressBar;
 
     private SignUpPresenter mPresenter = new SignUpPresenter(this);
     @Override
@@ -57,6 +59,8 @@ public class SignUpActivity extends Activity implements SignUpView{
         userPwd2 = (EditText) findViewById(R.id.et_sign_up_pwd_confirm);
 
         singUpBtn = (Button) findViewById(R.id.btn_sign_up);
+
+        progressBar = findViewById(R.id.progress_bar);
     }
 
     private void initEvents() {
@@ -73,6 +77,31 @@ public class SignUpActivity extends Activity implements SignUpView{
     @Override
     public Context getMyContext() {
         return SignUpActivity.this;
+    }
+
+    /**
+     * 显示进度条
+     */
+    @Override
+    public void showPorgressBar() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * 隐藏进度条
+     */
+    @Override
+    public void hidePorgressBar() {
+        progressBar.setVisibility(View.GONE);
+    }
+
+    /**
+     * 返回
+     */
+    @Override
+    public void goBack() {
+        MyActivityManager.getInstance().pop();
+        onBackPressed();
     }
 
     /**
