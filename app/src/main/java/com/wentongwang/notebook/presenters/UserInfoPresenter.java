@@ -55,12 +55,12 @@ public class UserInfoPresenter {
      * @param data 修改内容
      */
     public void upDateInfo(final int id, final String data) {
-        userInfoView.showProgressBar();
+        userInfoView.showPorgressBar();
         //更新用户在服务器上的表单
         userBiz.updateInfos(userInfoView.getMyContext(), id, data, new OnResponseListener() {
             @Override
             public void onResponse(Response response) {
-                userInfoView.hideProgressBar();
+                userInfoView.hidePorgressBar();
                 if (response.isSucces()) {
                     notifyChanges(id);
                     userInfoView.toUpdateUserInfo();
@@ -117,11 +117,11 @@ public class UserInfoPresenter {
      * @param photo 图片
      */
     public void uploadUserHead(File pic, Bitmap photo) {
-        userInfoView.showProgressBar();
+        userInfoView.showPorgressBar();
         userBiz.updateUserHead(userInfoView.getMyContext(), userInfoView.getCachePath(), pic, photo, new OnResponseListener() {
             @Override
             public void onResponse(Response response) {
-                userInfoView.hideProgressBar();
+                userInfoView.hidePorgressBar();
                 if (response.isSucces()) {
                     setUserHead(userInfoView.getCachePath());
                 } else {
@@ -138,11 +138,11 @@ public class UserInfoPresenter {
      * @param savePath 头像保存路径
      */
     public void setUserHead(String savePath) {
-        userInfoView.showProgressBar();
+        userInfoView.showPorgressBar();
         userBiz.getUserHeadFromServer(userInfoView.getMyContext(), savePath, new OnResponseListener() {
             @Override
             public void onResponse(Response response) {
-                userInfoView.hideProgressBar();
+                userInfoView.hidePorgressBar();
                 if (response.isSucces()) {
                     Bitmap bitmap = response.getBitmap();
                     userInfoView.setUserHead(bitmap);

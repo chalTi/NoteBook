@@ -114,7 +114,10 @@ public class NotesFragment extends Fragment implements NotesView{
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.getNotes();
+        if (listNotes != null && listNotes.size() == 0) {
+            mPresenter.getNotes();
+        }
+
     }
 
     private void initData() {
@@ -404,7 +407,8 @@ public class NotesFragment extends Fragment implements NotesView{
                         //如果有输入，获取输入的内容
                         constraint = constraint.toString().toLowerCase();
                         //遍历listview,判断是否有含有该内容的item保存到filteredArrList中
-                        for (int i = 0; i < mOriginalValues.size(); i++) {
+                        int listSize = mOriginalValues.size();
+                        for (int i = 0; i < listSize; i++) {
                             String content = mOriginalValues.get(i).getNote_content();
                             String data = mOriginalValues.get(i).getNote_date();
                             if (data.toLowerCase().startsWith(constraint.toString()) || content.toLowerCase().startsWith(constraint.toString())) {

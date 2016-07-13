@@ -51,7 +51,7 @@ import cn.bmob.v3.listener.FindListener;
 /**
  * Created by Wentong WANG on 2016/6/3.
  */
-public class DiariesFragment extends Fragment implements DiariesView{
+public class DiariesFragment extends Fragment implements DiariesView {
     //显示日记的list
     private ListView listView;
     //日记list的适配器
@@ -72,6 +72,7 @@ public class DiariesFragment extends Fragment implements DiariesView{
     private View progressBar;
 
     private DiariesFragmentPresenter mPresenter = new DiariesFragmentPresenter(this);
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -107,7 +108,9 @@ public class DiariesFragment extends Fragment implements DiariesView{
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.getDiaries();
+        if (diaryItems != null && diaryItems.size() == 0) {
+            mPresenter.getDiaries();
+        }
     }
 
     private void initDatas() {
@@ -217,6 +220,7 @@ public class DiariesFragment extends Fragment implements DiariesView{
 
     /**
      * 隐藏按钮
+     *
      * @param view
      */
     private void hideBtnAnim(View view) {
@@ -230,9 +234,10 @@ public class DiariesFragment extends Fragment implements DiariesView{
 
     /**
      * 显示按钮
+     *
      * @param view
      */
-    private void showBtnAnim(View view){
+    private void showBtnAnim(View view) {
 
         ObjectAnimator animator = ObjectAnimator.ofFloat(view, "translationY", 0);
         animator.setDuration(1000);
@@ -241,6 +246,7 @@ public class DiariesFragment extends Fragment implements DiariesView{
 
         isBtnShow = true;
     }
+
     @Override
     public void onPause() {
         super.onPause();
@@ -285,6 +291,7 @@ public class DiariesFragment extends Fragment implements DiariesView{
 
     /**
      * 更新列表
+     *
      * @param list
      */
     @Override
@@ -292,8 +299,10 @@ public class DiariesFragment extends Fragment implements DiariesView{
         diaryItems = list;
         adapter.notifyDataSetChanged();
     }
+
     /**
      * 跳转到日记详情界面
+     *
      * @param diaryItem
      */
     @Override
@@ -307,7 +316,8 @@ public class DiariesFragment extends Fragment implements DiariesView{
         intent.putExtras(bundle);
         startActivity(intent);
     }
-    private class MyListViewAdapter extends BaseAdapter implements Filterable{
+
+    private class MyListViewAdapter extends BaseAdapter implements Filterable {
         private List<DiaryItem> mOriginalValues;
 
         @Override
@@ -384,7 +394,8 @@ public class DiariesFragment extends Fragment implements DiariesView{
                         //如果有输入，获取输入的内容
                         constraint = constraint.toString().toLowerCase();
                         //遍历listview,判断是否有含有该内容的item保存到filteredArrList中
-                        for (int i = 0; i < mOriginalValues.size(); i++) {
+                        int listSize = mOriginalValues.size(); //这样做优化了在for循环中每一次都要调用.size()
+                        for (int i = 0; i < listSize; i++) {
                             String title = mOriginalValues.get(i).getDiary_title();
                             String data = mOriginalValues.get(i).getDiary_date();
                             if (data.toLowerCase().startsWith(constraint.toString()) || title.toLowerCase().startsWith(constraint.toString())) {

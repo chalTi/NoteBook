@@ -303,6 +303,7 @@ public class UserInfoActivity extends BaseActivity implements UserInfoView{
         progressBar.setVisibility(View.GONE);
     }
 
+
     /**
      * 返回
      */
