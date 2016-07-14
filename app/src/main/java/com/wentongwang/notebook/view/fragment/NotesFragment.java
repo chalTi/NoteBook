@@ -81,7 +81,6 @@ public class NotesFragment extends Fragment implements NotesView{
     @Subscribe
     public void onEventBackgroundThread(UpdataEvent event) {
         if (event.getType() == UpdataEvent.UPDATE_NOTES) {
-            mPresenter.canUpdateNotes(true);
             mPresenter.getNotes();
             adapter.notifyDataSetChanged();
         }
@@ -91,7 +90,6 @@ public class NotesFragment extends Fragment implements NotesView{
     public void onAttach(Context context) {
         //注册EventBus
         EventBus.getDefault().register(this);
-        mPresenter.canUpdateNotes(true);
         super.onAttach(context);
 
     }

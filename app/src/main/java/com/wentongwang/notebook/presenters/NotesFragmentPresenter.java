@@ -30,7 +30,6 @@ import cn.bmob.v3.listener.FindListener;
 public class NotesFragmentPresenter {
 
     private NotesView notesView;
-    private boolean update = true;
     private NoteBiz noteBiz;
     private UserBiz userBiz;
 
@@ -44,7 +43,6 @@ public class NotesFragmentPresenter {
      * 获取用户所有的便签
      */
     public void getNotes() {
-        if (update) {
             notesView.showPorgressBar();
 
             //查询该用户有的notes
@@ -64,24 +62,12 @@ public class NotesFragmentPresenter {
                         } else {
                             notesView.showNoDatas();
                         }
-                        update = false;
                     } else {
                         notesView.showNoDatas();
-                        update = true;
                         MyToast.showLong(notesView.getActivity(), "操作失败: " + response.getMsg());
                     }
                 }
             });
-        }
-    }
-
-    /**
-     * 只有第一次创建这个时候获取信息，以防在fragment暂时放到后台恢复时再次进行多余的请求
-     *
-     * @param is
-     */
-    public void canUpdateNotes(boolean is) {
-        update = is;
     }
 
     /**

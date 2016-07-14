@@ -4,20 +4,43 @@
     android:layout_height="match_parent"
     android:background="@drawable/white_background">
 
-    <include layout="@layout/toolbar_layout"
-        android:id="@+id/top_toolbar"/>
+    <include
+        android:id="@+id/top_toolbar"
+        layout="@layout/toolbar_layout" />
 
 
-    <EditText
-        android:paddingLeft="5dp"
-        android:paddingTop="5dp"
-        android:id="@+id/note_content"
-        android:layout_marginTop="50dp"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="top|left"
-        android:hint="写下自己的东西吧......"
-        android:background="@null"/>
+        android:layout_marginTop="50dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/recode_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="recode" />
+        </LinearLayout>
+
+        <EditText
+
+            android:id="@+id/note_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/recode_layout"
+            android:background="@null"
+            android:gravity="top|left"
+            android:hint="写下自己的东西吧......"
+            android:paddingLeft="5dp"
+            android:paddingTop="5dp" />
+    </LinearLayout>
+
 
     <Button
         android:id="@+id/confirm_btn"
@@ -38,20 +61,20 @@
         android:clickable="true"
         android:focusable="true"
         android:orientation="vertical"
-        android:visibility="gone" >
+        android:visibility="gone">
 
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"/>
+            android:layout_centerInParent="true" />
     </RelativeLayout>
 
     <com.wentongwang.notebook.view.custome.AudioRecoderButton
         android:id="@+id/audio_recoder"
-        android:layout_alignParentBottom="true"
-        android:layout_centerInParent="true"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
         android:layout_marginBottom="10dp"
-        android:background="@drawable/recode_btn"/>
+        android:background="@drawable/recode_btn" />
 </RelativeLayout>

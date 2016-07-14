@@ -11,15 +11,6 @@ import android.graphics.drawable.Drawable;
 public interface HomeView {
     Context getMyContext();
     /**
-     * 替换成notes的fragment
-     */
-    void showNotesFragment();
-    /**
-     * 替换成Diaries的fragment
-     */
-    void showDiariesFragment();
-
-    /**
      * 头像设置
      */
     void setUserHead(Bitmap bitmap);
@@ -46,4 +37,22 @@ public interface HomeView {
     String getCachePath();
 
     Resources getResources();
+
+    /**
+     * 刷新界面
+     * @param currentPage
+     */
+    void refresh(int currentPage);
+
+    void setCurrentPage(int page);
+
+    /**
+     * 显示关于我们
+     */
+    void showAboutUsFragment();
+    /**
+     * 设置toolbar标题
+     * @param title
+     */
+    void setTitle(String title);
 }

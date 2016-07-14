@@ -4,11 +4,16 @@ package com.wentongwang.notebook.view.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.view.KeyEvent;
 import android.view.View;
@@ -41,6 +46,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener,H
     //侧拉菜单界面
     private DrawerLayout drawerLayout;
     //toolbar部分的控件
+    private ImageView rightBtn;
     private ImageView leftBtn;
     private TextView title;
     private View toolbar;
@@ -58,7 +64,11 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener,H
     private ImageView userSex;
     //个人中心按钮
     private Button leftMenuBtn;
+    //ViewPager部分
+    private ViewPager mViewPager;
+    private boolean viewPagerVisiable = true;
 
+    private View mFrameLayout;
 
     private HomePresenter mPresenter = new HomePresenter(this);
     /**
@@ -94,7 +104,6 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener,H
         initDatas();
         initViews();
         initEvents();
-        showNotesFragment();
     }
 
     @Override
@@ -108,11 +117,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener,H
 
     @Override
     protected void initViews() {
-        toolbar = findViewById(R.id.top_toolbar);
-        leftBtn = (ImageView) toolbar.findViewById(R.id.left_btn);
-        title = (TextView) toolbar.findViewById(R.id.title);
-
-        title.setText("NoteBook");
+        initToolBar();
 
         drawerLayout = (DrawerLayout) findViewById(R.id.home_activity_drawerlayout);
 
@@ -130,10 +135,39 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener,H
 
         leftMenuBtn = (Button) findViewById(R.id.btn_left_menu_userinfo);
 
+        //初始化ViewPager
+        mViewPager = (ViewPager) findViewById(R.id.home_activity_viewpager);
+        mViewPager.setAdapter(new FragmentAdapter(getSupportFragmentManager()));
+        mPresenter.setCurrentPage(0);
+
+        mFrameLayout = findViewById(R.id.home_activity_container);
+        mFrameLayout.setVisibility(View.GONE);
+    }
+
+    /**
+     * 初始化顶部工具栏
+     */
+    private void initToolBar() {
+        toolbar = findViewById(R.id.top_toolbar);
+        leftBtn = (ImageView) toolbar.findViewById(R.id.left_btn);
+        rightBtn = (ImageView) toolbar.findViewById(R.id.right_btn);
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.refresh_btn);
+        rightBtn.setImageBitmap(bitmap);
+        rightBtn.setVisibility(View.VISIBLE);
+        title = (TextView) toolbar.findViewById(R.id.title);
+        title.setText("NoteBook");
     }
 
     @Override
     protected void initEvents() {
+        //toolbar的按钮事件
+        rightBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPresenter.refresh();
+            }
+        });
+
         leftBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -144,13 +178,12 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener,H
                 }
             }
         });
-
+        //左侧菜单栏的事件
         if (mTextViews != null && mTextViews.size() > 0) {
             for (int i = 0; i < mTextViews.size(); i++) {
                 mTextViews.get(i).setOnClickListener(this);
             }
         }
-
 
         leftMenuBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,6 +213,23 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener,H
 
             }
         });
+
+        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                mPresenter.setCurrentPage(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
 
@@ -188,12 +238,12 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener,H
         switch (v.getId()) {
             case R.id.left_menu_note:
                 //显示便签的fragment
-                showNotesFragment();
+                mPresenter.setCurrentPage(0);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.left_menu_diary:
                 //显示日记的fragment
-                showDiariesFragment();
+                mPresenter.setCurrentPage(1);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.left_menu_setting:
@@ -211,32 +261,14 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener,H
         return HomeActivity.this;
     }
 
-    /**
-     * 显示便笺列表界面
-     */
-    @Override
-    public void showNotesFragment() {
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.home_activity_container, notesFragment);
-        transaction.commit();
-    }
 
     /**
-     * 显示日记列表界面
-     */
-    @Override
-    public void showDiariesFragment() {
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.home_activity_container, diariesFragment);
-        transaction.commit();
-    }
-
-    /**
-     * 显示日记列表界面
+     * 显示关于我们
      */
     public void showAboutUsFragment() {
+        mViewPager.setVisibility(View.GONE);
+        mFrameLayout.setVisibility(View.VISIBLE);
+        viewPagerVisiable = false;
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.replace(R.id.home_activity_container, new AboutUsFragment());
@@ -305,10 +337,69 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener,H
         return getCacheDir().getAbsolutePath();
     }
 
+    /**
+     * 刷新界面
+     *
+     * @param currentPage
+     */
+    @Override
+    public void refresh(int currentPage) {
+        UpdataEvent event = new UpdataEvent();
+        if (currentPage == 0) {
+            event.setType(UpdataEvent.UPDATE_NOTES);
+        }else if (currentPage == 1) {
+            event.setType(UpdataEvent.UPDATE_DIARIES);
+        }
+        EventBus.getDefault().post(event);
+    }
+
+    @Override
+    public void setCurrentPage(int page) {
+        if (!viewPagerVisiable) {
+            mViewPager.setVisibility(View.VISIBLE);
+            mFrameLayout.setVisibility(View.GONE);
+        }
+        mViewPager.setCurrentItem(page);
+    }
+
+    /**
+     * 设置toolbar标题
+     *
+     * @param title
+     */
+    @Override
+    public void setTitle(String title) {
+        this.title.setText(title);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         //注销EventBus
         EventBus.getDefault().unregister(this);
+    }
+
+
+    class FragmentAdapter extends FragmentPagerAdapter {
+
+        public FragmentAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int arg0) {
+            switch (arg0) {
+                case 0:
+                    return notesFragment;
+                case 1:
+                    return diariesFragment;
+            }
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
     }
 }

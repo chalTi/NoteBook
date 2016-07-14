@@ -18,6 +18,8 @@ import com.wentongwang.notebook.view.activity.interfaces.HomeView;
  */
 public class HomePresenter {
 
+
+    private int currentPage;
     private HomeView homeView;
     private UserBiz userBiz;
     public HomePresenter(HomeView homeView) {
@@ -25,6 +27,31 @@ public class HomePresenter {
         this.userBiz = new UserBiz();
     }
 
+    /**
+     * 设置ViewPager当前页
+     * @param currentPage
+     */
+    public void setCurrentPage(int currentPage) {
+        this.currentPage = currentPage;
+        if (currentPage == 0) {
+            homeView.setTitle("我的便签");
+        } else {
+            homeView.setTitle("我的日记");
+        }
+        homeView.setCurrentPage(currentPage);
+    }
+
+    public void showAboutUsFragment(){
+        homeView.setTitle("关于");
+        homeView.showAboutUsFragment();
+    }
+
+    /**
+     * 刷新界面内容
+     */
+    public void refresh(){
+        homeView.refresh(currentPage);
+    }
 
     /**
      * 设置用户头像
